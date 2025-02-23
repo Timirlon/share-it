@@ -15,6 +15,7 @@ public class UserInMemoryDao {
         return users.values();
     }
 
+    //return type Optional<User>
     public User findById(int id) {
         return users.get(id);
     }

@@ -1,6 +1,7 @@
 package org.example.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.example.shareit.utils.RequestConstant;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public List<ItemDto> findAll(@RequestHeader("X-Sharer-User-Id") int userId) {
+    public List<ItemDto> findAll(@RequestHeader(RequestConstant.USER_HEADER) int userId) {
         return itemService.findAll(userId);
     }
 
@@ -24,7 +25,7 @@ public class ItemController {
     @PostMapping
     public ItemDto addItem(
             @RequestBody ItemDto item,
-            @RequestHeader("X-Sharer-User-Id") int userId) {
+            @RequestHeader(RequestConstant.USER_HEADER) int userId) {
         return itemService.addItem(item, userId);
     }
 
@@ -32,7 +33,7 @@ public class ItemController {
     public ItemDto updateItem(
             @PathVariable(name = "id") int itemId,
             @RequestBody ItemDto item,
-            @RequestHeader("X-Sharer-User-Id") int userId) {
+            @RequestHeader(RequestConstant.USER_HEADER) int userId) {
         return itemService.updateItem(itemId, item, userId);
     }
 

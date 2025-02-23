@@ -55,15 +55,9 @@ public class ItemService {
         Item patchItem = mapper.fromDto(dto);
         patchItem.setId(itemId);
         patchItem.setOwner(oldItem.getOwner());
-        if (patchItem.getName() == null) {
-            patchItem.setName(oldItem.getName());
-        }
-        if (patchItem.getDescription() == null) {
-            patchItem.setDescription(oldItem.getDescription());
-        }
-        if (dto.getAvailable() == null) {
-            patchItem.setAvailable(oldItem.isAvailable());
-        }
+        if (patchItem.getName() == null) patchItem.setName(oldItem.getName());
+        if (patchItem.getDescription() == null) patchItem.setDescription(oldItem.getDescription());
+        if (dto.getAvailable() == null) patchItem.setAvailable(oldItem.isAvailable());
 
 
         return mapper.toDto(itemDao.insert(patchItem));
@@ -83,5 +77,9 @@ public class ItemService {
                 })
                 .map(mapper::toDto)
                 .toList();
+    }
+
+    private boolean checkIfItemExistsById(int itemId) {
+        return itemDao.findById(itemId) != null;
     }
 }

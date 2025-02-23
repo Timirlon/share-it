@@ -22,17 +22,18 @@ public class ItemController {
     }
 
     @PostMapping
-    public Item addItem(
+    public ItemDto addItem(
             @RequestBody ItemDto item,
             @RequestHeader("X-Sharer-User-Id") int userId) {
         return itemService.addItem(item, userId);
     }
 
-    @PatchMapping
-    public Item updateItem(
+    @PatchMapping("/{id}")
+    public ItemDto updateItem(
+            @PathVariable(name = "id") int itemId,
             @RequestBody ItemDto item,
             @RequestHeader("X-Sharer-User-Id") int userId) {
-        return itemService.updateItem(item, userId);
+        return itemService.updateItem(itemId, item, userId);
     }
 
     @GetMapping("/search")

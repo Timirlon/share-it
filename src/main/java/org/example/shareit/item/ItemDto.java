@@ -12,6 +12,6 @@ public class ItemDto {
     int id;
     String name;
     String description;
-    boolean available;
+    Boolean available;
     String owner;
 }

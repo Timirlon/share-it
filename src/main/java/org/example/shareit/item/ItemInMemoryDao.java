@@ -9,6 +9,7 @@ import java.util.Map;
 @Component
 public class ItemInMemoryDao {
     Map<Integer, Item> items = new HashMap<>();
+    int idCounter = 0;
 
     public Collection<Item> findAll() {
         return items.values();
@@ -19,6 +20,10 @@ public class ItemInMemoryDao {
     }
 
     public Item insert(Item item) {
+        if (item.getId() == 0) {
+            item.setId(++idCounter);
+        }
+
         items.put(item.getId(), item);
         return item;
     }

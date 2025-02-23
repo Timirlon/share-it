@@ -22,12 +22,19 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@RequestBody UserDto user) {
+    public UserDto create(@RequestBody UserDto user) {
         return userService.create(user);
     }
 
-    @PutMapping
-    public User update(@RequestBody UserDto user) {
-        return userService.update(user);
+    @PatchMapping("/{id}")
+    public UserDto update(
+            @PathVariable int id,
+            @RequestBody UserDto user) {
+        return userService.update(id, user);
+    }
+
+    @DeleteMapping("/{id}")
+    public UserDto delete(@PathVariable int id) {
+        return userService.remove(id);
     }
 }

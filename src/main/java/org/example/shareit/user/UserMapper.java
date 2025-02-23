@@ -8,7 +8,7 @@ public class UserMapper {
         UserDto dto = new UserDto();
 
         dto.setId(user.getId());
-        dto.setLogin(user.getLogin());
+        dto.setName(user.getName());
         dto.setEmail(user.getEmail());
 
         return dto;
@@ -17,8 +17,7 @@ public class UserMapper {
     public User fromDto(UserDto dto) {
         User user = new User();
 
-        user.setId(dto.getId());
-        user.setLogin(dto.getLogin());
+        user.setName(dto.getName());
         user.setEmail(dto.getEmail());
 
         return user;

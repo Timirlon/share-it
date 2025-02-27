@@ -1,5 +1,6 @@
 package org.example.shareit.user;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@RequestBody UserDto user) {
+    public UserDto create(@Valid @RequestBody UserDto user) {
         return userService.create(user);
     }
 
@@ -34,7 +35,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public UserDto delete(@PathVariable int id) {
-        return userService.remove(id);
+    public UserDto deleteById(@PathVariable int id) {
+        return userService.deleteById(id);
     }
 }

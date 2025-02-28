@@ -1,10 +1,9 @@
 package org.example.shareit.item;
 
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.example.shareit.exception.NotFoundException;
 import org.example.shareit.user.User;
-import org.example.shareit.user.UserInMemoryDao;
+import org.example.shareit.user.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,74 +11,63 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ItemService {
-    private final ItemInMemoryDao itemDao;
+    private final ItemRepository itemRepository;
     private final ItemMapper mapper;
-    private final UserInMemoryDao userDao;
+    private final UserRepository userRepository;
 
     public List<ItemDto> findAll(int ownerId) {
-        return itemDao.findAll().stream()
-                .filter(item -> item.getOwner().getId() == ownerId)
-                .map(mapper::toDto)
-                .toList();
+        return mapper.toDto(itemRepository.findAllByOwnerId(ownerId));
     }
 
     public ItemDto findById(int id) {
-        return mapper.toDto(itemDao.findById(id));
+        return mapper.toDto(itemRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Товар не найден.")));
     }
 
-    public ItemDto addItem(ItemDto dto, int userId) {
-        if (dto.getName() == null || dto.getName().isEmpty() || dto.getDescription() == null
-                || dto.getDescription().isEmpty() || dto.getAvailable() == null) {
-            throw new ValidationException("Недействительные учетные данные товара.");
-        }
+    public ItemDto addItem(ItemDto itemDto, int userId) {
+        Item item = mapper.fromDto(itemDto);
 
-        Item item = mapper.fromDto(dto);
-
-        User owner = userDao.findById(userId);
-        if (owner == null) {
-            throw new NotFoundException("Пользователь не найден.");
-        }
-
+        User owner = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
         item.setOwner(owner);
 
-        return mapper.toDto(itemDao.insert(item));
+
+        return mapper.toDto(itemRepository.save(item));
     }
 
-    public ItemDto updateItem(int itemId, ItemDto dto, int userId) {
-        Item oldItem = itemDao.findById(itemId);
+    public ItemDto updateItem(int itemId, ItemDto itemDto, int userId) {
+        Item oldItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Товар не найден"));
 
-        if (oldItem == null || oldItem.getOwner().getId() != userId) {
+        if (oldItem.getOwner().getId() != userId) {
             throw new NotFoundException("Товар не найден");
         }
 
-        Item patchItem = mapper.fromDto(dto);
+        Item patchItem = mapper.fromDto(itemDto);
         patchItem.setId(itemId);
         patchItem.setOwner(oldItem.getOwner());
-        if (patchItem.getName() == null) patchItem.setName(oldItem.getName());
-        if (patchItem.getDescription() == null) patchItem.setDescription(oldItem.getDescription());
-        if (dto.getAvailable() == null) patchItem.setAvailable(oldItem.isAvailable());
+
+        if (patchItem.getName() == null) {
+            patchItem.setName(oldItem.getName());
+        }
+
+        if (patchItem.getDescription() == null) {
+            patchItem.setDescription(oldItem.getDescription());
+        }
+
+        if (itemDto.getAvailable() == null) {
+            patchItem.setAvailable(oldItem.isAvailable());
+        }
 
 
-        return mapper.toDto(itemDao.insert(patchItem));
+        return mapper.toDto(itemRepository.save(patchItem));
     }
 
     public List<ItemDto> findByText(String text) {
-        if (text == null || text.isEmpty()) return List.of();
+        if (text == null || text.isEmpty()) {
+            return List.of();
+        }
 
-        return itemDao.findAll().stream()
-                .filter(Item::isAvailable)
-                .filter(item -> {
-                    String subStr = text.toLowerCase();
-                    String lowerName = item.getName().toLowerCase();
-                    String lowerDesc = item.getDescription().toLowerCase();
-
-                    return lowerName.contains(subStr) || lowerDesc.contains(subStr);
-                })
-                .map(mapper::toDto)
-                .toList();
-    }
-
-    private boolean checkIfItemExistsById(int itemId) {
-        return itemDao.findById(itemId) != null;
+        return mapper.toDto(itemRepository.findAllByNameContainingIgnoreCase(text));
     }
 }

@@ -2,6 +2,7 @@ package org.example.shareit.user;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.example.shareit.exception.DataConflictException;
 import org.example.shareit.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -10,24 +11,24 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserInMemoryDao dao;
+    private final UserRepository userRepository;
     private final UserMapper mapper;
 
     public List<UserDto> findAll() {
-        return dao.findAll().stream()
-                .map(mapper::toDto)
-                .toList();
+        return mapper.toDto(userRepository.findAll());
     }
 
     public UserDto findById(int id) {
-        return mapper.toDto(dao.findById(id));
+        return mapper.toDto(userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден.")));
     }
 
     public UserDto create(UserDto userDto) {
         User user = mapper.fromDto(userDto);
-        validateEmail(user.getEmail());
 
-        return mapper.toDto(dao.insert(user));
+        validateEmailIsNotTaken(user.getEmail());
+
+        return mapper.toDto(userRepository.save(user));
     }
 
     public UserDto update(int userId, UserDto userDto) {
@@ -35,34 +36,41 @@ public class UserService {
         user.setId(userId);
 
 
-        User oldUser = checkIfUserExistsById(userId);
-        if (user.getName() == null) user.setName(oldUser.getName());
-        if (user.getEmail() == null) user.setEmail(oldUser.getEmail());
+        User oldUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
 
-        validateEmail(user.getEmail());
-
-        return mapper.toDto(dao.insert(user));
-    }
-
-    public UserDto remove(int userId) {
-        checkIfUserExistsById(userId);
-
-        return mapper.toDto(dao.remove(userId));
-    }
-
-    private User checkIfUserExistsById(int userId) {
-        User user = dao.findById(userId);
-
-        if (user == null) {
-            throw new NotFoundException("Пользователь не найден.");
+        if (user.getName() == null) {
+            user.setName(oldUser.getName());
+        }
+        if (user.getEmail() == null) {
+            user.setEmail(oldUser.getEmail());
+        } else {
+            validateEmailIsNotTaken(user.getEmail());
+            validateEmailPattern(user.getEmail());
         }
 
-        return user;
+
+        return mapper.toDto(userRepository.save(user));
     }
 
-    private void validateEmail(String email) {
+    public UserDto deleteById(int userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
+
+        userRepository.deleteById(userId);
+
+        return mapper.toDto(user);
+    }
+
+    private void validateEmailPattern(String email) {
         if (email == null || email.isEmpty() || !email.matches("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$")) {
-            throw new ValidationException("Указан некорректный адрес эл.почты.");
+            throw new ValidationException("Некорректный адрес эл.почты.");
+        }
+    }
+
+    private void validateEmailIsNotTaken(String email) {
+        if (userRepository.findAllEmails().contains(email)) {
+            throw new DataConflictException("Данная эл.почта занята.");
         }
     }
 }

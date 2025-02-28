@@ -3,6 +3,8 @@ package org.example.shareit.item;
 import jakarta.validation.ValidationException;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class ItemMapper {
     public ItemDto toDto(Item item) {
@@ -25,5 +27,11 @@ public class ItemMapper {
         if (dto.getAvailable() != null) item.setAvailable(dto.getAvailable());
 
         return item;
+    }
+
+    public List<ItemDto> toDto(List<Item> items) {
+        return items.stream()
+                .map(this::toDto)
+                .toList();
     }
 }

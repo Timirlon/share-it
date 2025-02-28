@@ -5,7 +5,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.example.shareit.booking.Booking;
 import org.example.shareit.user.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,4 +31,7 @@ public class Item {
 
     @ManyToOne
     User owner;
+
+    @OneToMany(mappedBy = "item")
+    List<Booking> bookings = new ArrayList<>();
 }

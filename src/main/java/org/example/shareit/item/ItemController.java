@@ -24,18 +24,18 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto addItem(
+    public ItemDto create(
             @Valid @RequestBody ItemDto item,
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {
-        return itemService.addItem(item, userId);
+        return itemService.create(item, userId);
     }
 
     @PatchMapping("/{id}")
-    public ItemDto updateItem(
+    public ItemDto update(
             @PathVariable(name = "id") int itemId,
             @RequestBody ItemDto item,
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {
-        return itemService.updateItem(itemId, item, userId);
+        return itemService.update(itemId, item, userId);
     }
 
     @GetMapping("/search")

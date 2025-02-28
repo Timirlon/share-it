@@ -24,7 +24,7 @@ public class ItemService {
                 .orElseThrow(() -> new NotFoundException("Товар не найден.")));
     }
 
-    public ItemDto addItem(ItemDto itemDto, int userId) {
+    public ItemDto create(ItemDto itemDto, int userId) {
         Item item = mapper.fromDto(itemDto);
 
         User owner = userRepository.findById(userId)
@@ -35,7 +35,7 @@ public class ItemService {
         return mapper.toDto(itemRepository.save(item));
     }
 
-    public ItemDto updateItem(int itemId, ItemDto itemDto, int userId) {
+    public ItemDto update(int itemId, ItemDto itemDto, int userId) {
         Item oldItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Товар не найден"));
 

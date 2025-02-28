@@ -1,6 +1,5 @@
 package org.example.shareit.user;
 
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.example.shareit.exception.DataConflictException;
 import org.example.shareit.exception.NotFoundException;
@@ -46,7 +45,6 @@ public class UserService {
             user.setEmail(oldUser.getEmail());
         } else {
             validateEmailIsNotTaken(user.getEmail());
-            validateEmailPattern(user.getEmail());
         }
 
 
@@ -62,14 +60,8 @@ public class UserService {
         return mapper.toDto(user);
     }
 
-    private void validateEmailPattern(String email) {
-        if (email == null || email.isEmpty() || !email.matches("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$")) {
-            throw new ValidationException("Некорректный адрес эл.почты.");
-        }
-    }
-
     private void validateEmailIsNotTaken(String email) {
-        if (userRepository.findAllEmails().contains(email)) {
+        if (userRepository.findByEmail(email) != null) {
             throw new DataConflictException("Данная эл.почта занята.");
         }
     }

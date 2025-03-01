@@ -29,6 +29,13 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handle(ValidationException e) {
         log.warn(e.getMessage());
-        return new ErrorResponse("Ошибка валидации.", e.getMessage());
+        return new ErrorResponse("Недействительные учетные данные.", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handle(ForbiddenAccessException e) {
+        log.warn(e.getMessage());
+        return new ErrorResponse("Доступ ограничен.", e.getMessage());
     }
 }

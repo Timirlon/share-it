@@ -1,6 +1,8 @@
 package org.example.shareit.booking;
 
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.example.shareit.exception.ForbiddenAccessException;
 import org.example.shareit.exception.NotFoundException;
 import org.example.shareit.item.Item;
 import org.example.shareit.item.ItemRepository;
@@ -10,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,10 @@ public class BookingService {
 
         Item bookedItem = itemRepository.findById(dto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Товар не найден."));
+
+        if (!bookedItem.isAvailable()) {
+            throw new ValidationException("Товар недоступен.");
+        }
         booking.setItem(bookedItem);
 
 
@@ -40,8 +45,9 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Запись не найдена."));
 
+
         if (userId != booking.getItem().getOwner().getId()) {
-            throw new NotFoundException("Запись не найдена.");
+            throw new ForbiddenAccessException("Вы не можете одобрить запрос.");
         }
 
         if (approved) {
@@ -49,6 +55,7 @@ public class BookingService {
         } else {
             booking.setStatus(BookingStatus.REJECTED);
         }
+
 
         return mapper.toReadDto(bookingRepository.save(booking));
     }
@@ -58,7 +65,7 @@ public class BookingService {
                 .orElseThrow(() -> new NotFoundException("Запись не найдена."));
 
         if (userId != booking.getBooker().getId()
-                || userId != booking.getItem().getOwner().getId()) {
+                && userId != booking.getItem().getOwner().getId()) {
 
             throw new NotFoundException("Запись не найдена.");
         }
@@ -115,41 +122,4 @@ public class BookingService {
         return mapper.toReadDto(bookings);
     }
 
-    private List<BookingReadDto> filterBookingsByState(List<Booking> bookings, String state) {
-        Stream<Booking> stream = bookings.stream();
-        LocalDateTime now = LocalDateTime.now();
-
-
-        if (state.equalsIgnoreCase("CURRENT")) {
-
-            stream = stream.filter(booking -> booking.getStartDate().isBefore(now)
-                    && booking.getEndDate().isAfter(now)
-                    && booking.getStatus() == BookingStatus.APPROVED);
-
-        } else if (state.equalsIgnoreCase("PAST")) {
-
-            stream = stream.filter(booking -> booking.getEndDate().isBefore(now)
-                    && booking.getStatus() == BookingStatus.APPROVED);
-
-        } else if (state.equalsIgnoreCase("FUTURE")) {
-
-            stream = stream.filter(booking -> booking.getStartDate().isAfter(now)
-                    && booking.getStatus() == BookingStatus.APPROVED);
-
-        } else if (state.equalsIgnoreCase("WAITING")) {
-
-            stream = stream.filter(booking -> booking.getStatus() == BookingStatus.WAITING);
-
-        } else if (state.equalsIgnoreCase("REJECTED")) {
-
-            stream = stream.filter(booking -> booking.getStatus() == BookingStatus.REJECTED);
-
-        } else if (!state.equalsIgnoreCase("ALL")) {
-
-            throw new IllegalArgumentException();
-        }
-
-
-        return stream.map(mapper::toReadDto).toList();
-    }
 }

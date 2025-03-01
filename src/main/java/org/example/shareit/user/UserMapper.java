@@ -25,6 +25,15 @@ public class UserMapper {
         return user;
     }
 
+    public User fromDto(UserUpdDto dto) {
+        User user = new User();
+
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+
+        return user;
+    }
+
     public List<UserDto> toDto(List<User> users) {
         return users.stream()
                 .map(this::toDto)

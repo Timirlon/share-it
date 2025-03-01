@@ -30,8 +30,8 @@ public class UserService {
         return mapper.toDto(userRepository.save(user));
     }
 
-    public UserDto update(int userId, UserDto userDto) {
-        User user = mapper.fromDto(userDto);
+    public UserDto update(int userId, UserUpdDto dto) {
+        User user = mapper.fromDto(dto);
         user.setId(userId);
 
 

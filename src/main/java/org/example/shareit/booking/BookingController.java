@@ -42,7 +42,7 @@ public class BookingController {
     @GetMapping
     public List<BookingReadDto> findMyBookings(
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId,
-            @RequestParam(defaultValue = "ALL", required = false) String state) {
+            @RequestParam(defaultValue = "ALL", required = false) FilterState state) {
 
         return bookingService.findAllByBookerId(userId, state);
     }
@@ -50,7 +50,7 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingReadDto> findBookingsOfMyItem(
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId,
-            @RequestParam(defaultValue = "ALL", required = false) String state) {
+            @RequestParam(defaultValue = "ALL", required = false) FilterState state) {
 
         return bookingService.findAllByItemOwnerId(userId, state);
     }

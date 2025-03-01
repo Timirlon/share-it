@@ -4,17 +4,17 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
+import org.example.shareit.item.ItemDto;
+import org.example.shareit.user.UserDto;
 
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingReadDto {
     int id;
-    String startDate;
-    String endDate;
-    String itemName;
-    String bookerName;
-    String status;
+    String start;
+    String end;
+    ItemDto item;
+    UserDto booker;
+    BookingStatus status;
 }

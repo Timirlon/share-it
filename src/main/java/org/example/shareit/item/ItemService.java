@@ -68,6 +68,6 @@ public class ItemService {
             return List.of();
         }
 
-        return mapper.toDto(itemRepository.findAllByNameContainingIgnoreCase(text));
+        return mapper.toDto(itemRepository.findAllByText(text));
     }
 }

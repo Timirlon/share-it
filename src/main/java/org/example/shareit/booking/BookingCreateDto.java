@@ -1,5 +1,7 @@
 package org.example.shareit.booking;
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,9 +15,13 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingCreateDto {
     @NotNull
-    LocalDateTime startDate;
+    @FutureOrPresent
+    LocalDateTime start;
+
     @NotNull
-    LocalDateTime endDate;
+    @Future
+    LocalDateTime end;
+
     @NotNull
-    int itemId;
+    Integer itemId;
 }

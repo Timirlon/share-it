@@ -34,4 +34,7 @@ public class Item {
 
     @OneToMany(mappedBy = "item")
     List<Booking> bookings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item")
+    List<Comment> comments = new ArrayList<>();
 }

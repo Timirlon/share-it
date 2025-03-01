@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -21,6 +24,8 @@ public class ItemDto {
 
     @NotNull(message = "Требуется задать статус!")
     Boolean available;
+
+    List<CommentReadDto> comments = new ArrayList<>();
 
     String owner;
 }

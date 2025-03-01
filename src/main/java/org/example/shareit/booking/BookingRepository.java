@@ -38,4 +38,7 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     // WAITING/REJECTED - в зависимости от параметра
     List<Booking> findAllByItem_Owner_IdAndStatusOrderByStartDateDesc(int ownerId, BookingStatus status);
+
+
+    List<Booking> findAllByBooker_IdAndItem_Id(int bookerId, int itemId);
 }

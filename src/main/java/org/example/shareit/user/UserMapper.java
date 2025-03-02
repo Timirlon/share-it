@@ -2,6 +2,8 @@ package org.example.shareit.user;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class UserMapper {
     public UserDto toDto(User user) {
@@ -21,5 +23,20 @@ public class UserMapper {
         user.setEmail(dto.getEmail());
 
         return user;
+    }
+
+    public User fromDto(UserUpdDto dto) {
+        User user = new User();
+
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+
+        return user;
+    }
+
+    public List<UserDto> toDto(List<User> users) {
+        return users.stream()
+                .map(this::toDto)
+                .toList();
     }
 }

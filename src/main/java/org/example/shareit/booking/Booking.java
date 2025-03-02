@@ -33,5 +33,6 @@ public class Booking {
     @ManyToOne
     User booker;
 
+    @Enumerated(value = EnumType.STRING)
     BookingStatus status;
 }

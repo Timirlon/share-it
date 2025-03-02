@@ -40,5 +40,5 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findAllByItem_Owner_IdAndStatusOrderByStartDateDesc(int ownerId, BookingStatus status);
 
 
-    List<Booking> findAllByBooker_IdAndItem_Id(int bookerId, int itemId);
+    List<Booking> findAllByBooker_IdAndItem_IdAndStatusAndStartDateBeforeOrderByStartDateAsc(int bookerId, int itemId, BookingStatus status, LocalDateTime start);
 }

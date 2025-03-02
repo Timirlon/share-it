@@ -1,9 +1,10 @@
 package org.example.shareit.item;
 
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.example.shareit.booking.Booking;
 import org.example.shareit.booking.BookingRepository;
-import org.example.shareit.exception.ForbiddenAccessException;
+import org.example.shareit.booking.BookingStatus;
 import org.example.shareit.exception.NotFoundException;
 import org.example.shareit.user.User;
 import org.example.shareit.user.UserRepository;
@@ -89,10 +90,10 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Товар не найден."));
 
-        Booking booking = bookingRepository.findAllByBooker_IdAndItem_Id(
-                authorId, itemId).stream()
+        Booking booking = bookingRepository.findAllByBooker_IdAndItem_IdAndStatusAndStartDateBeforeOrderByStartDateAsc(
+                authorId, itemId, BookingStatus.APPROVED, LocalDateTime.now()).stream()
                 .findFirst()
-                .orElseThrow(() -> new ForbiddenAccessException("Вы не можете оставлять отзыв на этот товар."));
+                .orElseThrow(() -> new ValidationException("Вы не можете оставлять отзыв на этот товар."));
 
 
         comment.setAuthor(author);

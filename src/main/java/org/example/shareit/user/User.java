@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import org.example.shareit.booking.Booking;
 import org.example.shareit.item.Comment;
 import org.example.shareit.item.Item;
+import org.example.shareit.requests.Request;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,4 +36,7 @@ public class User {
 
     @OneToMany(mappedBy = "author")
     List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "requestor")
+    List<Request> requests = new ArrayList<>();
 }

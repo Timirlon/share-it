@@ -28,4 +28,6 @@ public class ItemDto {
     List<CommentReadDto> comments = new ArrayList<>();
 
     String owner;
+
+    Integer requestId;
 }

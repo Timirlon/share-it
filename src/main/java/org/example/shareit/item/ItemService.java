@@ -1,11 +1,15 @@
 package org.example.shareit.item;
 
 import jakarta.validation.ValidationException;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.example.shareit.booking.Booking;
 import org.example.shareit.booking.BookingRepository;
 import org.example.shareit.booking.BookingStatus;
 import org.example.shareit.exception.NotFoundException;
+import org.example.shareit.requests.Request;
+import org.example.shareit.requests.RequestRepository;
 import org.example.shareit.user.User;
 import org.example.shareit.user.UserRepository;
 import org.springframework.stereotype.Service;
@@ -15,14 +19,16 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ItemService {
-    private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
-    private final BookingRepository bookingRepository;
-    private final CommentRepository commentRepository;
+    ItemRepository itemRepository;
+    UserRepository userRepository;
+    BookingRepository bookingRepository;
+    CommentRepository commentRepository;
+    RequestRepository requestRepository;
 
-    private final ItemMapper itemMapper;
-    private final CommentMapper commentMapper;
+    ItemMapper itemMapper;
+    CommentMapper commentMapper;
 
 
     public List<ItemDto> findAll(int ownerId) {
@@ -41,6 +47,12 @@ public class ItemService {
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
         item.setOwner(owner);
 
+        if (itemDto.getRequestId() != null) {
+            Request request = requestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Запрос не найден"));
+
+            item.setRequest(request);
+        }
 
         return itemMapper.toDto(itemRepository.save(item));
     }

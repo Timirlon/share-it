@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class RequestMapper {
-    ItemMapper itemMapper;
+    private final ItemMapper itemMapper;
 
     public RequestReadDto toDto(Request request) {
         RequestReadDto dto = new RequestReadDto();

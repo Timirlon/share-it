@@ -30,8 +30,8 @@ public class RequestController {
     @GetMapping("/all")
     public List<RequestReadDto> findAllOfOthers(
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId,
-            @RequestParam int from,
-            @RequestParam int size) {
+            @RequestParam(defaultValue = "0") int from,
+            @RequestParam(defaultValue = "10") int size) {
 
         return requestService.findAllByRequestorIdExcludingOrderByCreation(userId, from, size);
     }

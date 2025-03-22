@@ -20,6 +20,10 @@ public class ItemMapper {
         dto.setOwner(item.getOwner().getName());
         dto.setComments(commentMapper.toDto(item.getComments()));
 
+        if (item.getRequest() != null) {
+            dto.setRequestId(item.getRequest().getId());
+        }
+
         return dto;
     }
 
@@ -28,7 +32,10 @@ public class ItemMapper {
 
         item.setName(dto.getName());
         item.setDescription(dto.getDescription());
-        if (dto.getAvailable() != null) item.setAvailable(dto.getAvailable());
+
+        if (dto.getAvailable() != null) {
+            item.setAvailable(dto.getAvailable());
+        }
 
         return item;
     }

@@ -12,6 +12,8 @@ import org.example.shareit.requests.Request;
 import org.example.shareit.requests.RequestRepository;
 import org.example.shareit.user.User;
 import org.example.shareit.user.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,8 +33,12 @@ public class ItemService {
     CommentMapper commentMapper;
 
 
-    public List<ItemDto> findAll(int ownerId) {
-        return itemMapper.toDto(itemRepository.findAllByOwnerId(ownerId));
+    public List<ItemDto> findAll(int ownerId, int from, int size) {
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size);
+
+        return itemMapper.toDto(
+                itemRepository.findAllByOwnerId(ownerId, pageable));
     }
 
     public ItemDto findById(int id) {
@@ -85,12 +91,15 @@ public class ItemService {
         return itemMapper.toDto(itemRepository.save(patchItem));
     }
 
-    public List<ItemDto> findByText(String text) {
+    public List<ItemDto> findByText(String text, int from, int size) {
         if (text == null || text.isEmpty()) {
             return List.of();
         }
 
-        return itemMapper.toDto(itemRepository.findAllByText(text));
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size);
+
+        return itemMapper.toDto(itemRepository.findAllByText(text, pageable));
     }
 
     public CommentReadDto addComment(CommentCreateDto commentDto, int itemId, int authorId) {

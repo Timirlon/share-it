@@ -38,10 +38,6 @@ public class RequestService {
     }
 
     public List<RequestReadDto> findAllByRequestorIdExcludingOrderByCreation(int requestorId, int from, int size) {
-        if (from < 0 || size < 1) {
-            throw new IndexOutOfBoundsException();
-        }
-
         getUserById(requestorId);
 
 

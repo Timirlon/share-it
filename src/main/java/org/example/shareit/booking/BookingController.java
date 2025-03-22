@@ -1,7 +1,10 @@
 package org.example.shareit.booking;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,16 +45,20 @@ public class BookingController {
     @GetMapping
     public List<BookingReadDto> findMyBookings(
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId,
-            @RequestParam(defaultValue = "ALL", required = false) FilterState state) {
+            @RequestParam(defaultValue = "ALL") FilterState state,
+            @RequestParam(defaultValue = "0") @Min(value = 0) int from,
+            @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size) {
 
-        return bookingService.findAllByBookerId(userId, state);
+        return bookingService.findAllByBookerId(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingReadDto> findBookingsOfMyItem(
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId,
-            @RequestParam(defaultValue = "ALL", required = false) FilterState state) {
+            @RequestParam(defaultValue = "ALL", required = false) FilterState state,
+            @RequestParam(defaultValue = "0") @Min(value = 0) int from,
+            @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size) {
 
-        return bookingService.findAllByItemOwnerId(userId, state);
+        return bookingService.findAllByItemOwnerId(userId, state, from, size);
     }
 }

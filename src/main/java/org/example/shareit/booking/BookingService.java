@@ -8,6 +8,8 @@ import org.example.shareit.item.Item;
 import org.example.shareit.item.ItemRepository;
 import org.example.shareit.user.User;
 import org.example.shareit.user.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -73,50 +75,60 @@ public class BookingService {
         return mapper.toReadDto(booking);
     }
 
-    public List<BookingReadDto> findAllByBookerId(int userId, FilterState state) {
+    public List<BookingReadDto> findAllByBookerId(int userId, FilterState state, int from, int size) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
+
+
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size);
+
 
         LocalDateTime now = LocalDateTime.now();
 
         List<Booking> bookings = switch (state) {
-            case ALL -> bookingRepository.findAllByBooker_IdOrderByStartDateDesc(userId);
+            case ALL -> bookingRepository.findAllByBooker_IdOrderByStartDateDesc(userId, pageable);
             case CURRENT ->
                     bookingRepository.findAllByBooker_IdAndStartDateGreaterThanEqualAndEndDateIsAfterOrderByStartDateDesc(
-                            userId, now, now);
+                            userId, now, now, pageable);
             case PAST ->
-                    bookingRepository.findAllByBooker_IdAndEndDateIsBeforeOrderByStartDateDesc(userId, now);
+                    bookingRepository.findAllByBooker_IdAndEndDateIsBeforeOrderByStartDateDesc(userId, now, pageable);
             case FUTURE ->
-                    bookingRepository.findAllByBooker_IdAndStartDateIsAfterOrderByStartDateDesc(userId, now);
+                    bookingRepository.findAllByBooker_IdAndStartDateIsAfterOrderByStartDateDesc(userId, now, pageable);
             case WAITING ->
-                    bookingRepository.findAllByBooker_IdAndStatusOrderByStartDateDesc(userId, BookingStatus.WAITING);
+                    bookingRepository.findAllByBooker_IdAndStatusOrderByStartDateDesc(userId, BookingStatus.WAITING, pageable);
             case REJECTED ->
-                    bookingRepository.findAllByBooker_IdAndStatusOrderByStartDateDesc(userId, BookingStatus.REJECTED);
+                    bookingRepository.findAllByBooker_IdAndStatusOrderByStartDateDesc(userId, BookingStatus.REJECTED, pageable);
         };
 
 
         return mapper.toReadDto(bookings);
     }
 
-    public List<BookingReadDto> findAllByItemOwnerId(int ownerId, FilterState state) {
+    public List<BookingReadDto> findAllByItemOwnerId(int ownerId, FilterState state, int from, int size) {
         userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
+
+
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size);
+
 
         LocalDateTime now = LocalDateTime.now();
 
         List<Booking> bookings = switch (state) {
-            case ALL -> bookingRepository.findAllByItem_Owner_IdOrderByStartDateDesc(ownerId);
+            case ALL -> bookingRepository.findAllByItem_Owner_IdOrderByStartDateDesc(ownerId, pageable);
             case CURRENT ->
                     bookingRepository.findAllByItem_Owner_IdAndStartDateGreaterThanEqualAndEndDateIsAfterOrderByStartDateDesc(
-                            ownerId, now, now);
+                            ownerId, now, now, pageable);
             case FUTURE ->
-                    bookingRepository.findAllByItem_Owner_IdAndStartDateIsAfterOrderByStartDateDesc(ownerId, now);
+                    bookingRepository.findAllByItem_Owner_IdAndStartDateIsAfterOrderByStartDateDesc(ownerId, now, pageable);
             case PAST ->
-                    bookingRepository.findAllByItem_Owner_IdAndEndDateIsBeforeOrderByStartDateDesc(ownerId, now);
+                    bookingRepository.findAllByItem_Owner_IdAndEndDateIsBeforeOrderByStartDateDesc(ownerId, now, pageable);
             case WAITING ->
-                    bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDateDesc(ownerId, BookingStatus.WAITING);
+                    bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDateDesc(ownerId, BookingStatus.WAITING, pageable);
             case REJECTED ->
-                    bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDateDesc(ownerId, BookingStatus.REJECTED);
+                    bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDateDesc(ownerId, BookingStatus.REJECTED, pageable);
         };
 
         return mapper.toReadDto(bookings);

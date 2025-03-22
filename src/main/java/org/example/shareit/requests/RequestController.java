@@ -1,7 +1,10 @@
 package org.example.shareit.requests;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,8 +33,8 @@ public class RequestController {
     @GetMapping("/all")
     public List<RequestReadDto> findAllOfOthers(
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId,
-            @RequestParam(defaultValue = "0") int from,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") @Min(value = 0) int from,
+            @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size) {
 
         return requestService.findAllByRequestorIdExcludingOrderByCreation(userId, from, size);
     }

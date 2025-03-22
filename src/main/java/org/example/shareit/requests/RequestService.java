@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.shareit.exception.NotFoundException;
 import org.example.shareit.user.User;
 import org.example.shareit.user.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +22,7 @@ public class RequestService {
     public RequestReadDto create(RequestCreateDto dto, int requestorId) {
         Request request = requestMapper.fromDto(dto);
 
-        User requestor = checkIfUserExistsById(requestorId);
+        User requestor = getUserById(requestorId);
         request.setRequestor(requestor);
 
 
@@ -29,21 +31,25 @@ public class RequestService {
     }
 
     public List<RequestReadDto> findAllByRequestorId(int requestorId) {
-        checkIfUserExistsById(requestorId);
+        getUserById(requestorId);
 
         return requestMapper.toDto(
                 requestRepository.findAllByRequestor_IdOrderByCreatedDesc(requestorId));
     }
 
     public List<RequestReadDto> findAllByRequestorIdExcludingOrderByCreation(int requestorId, int from, int size) {
-        if (from < 0) {
+        if (from < 0 || size < 1) {
             throw new IndexOutOfBoundsException();
         }
 
-        checkIfUserExistsById(requestorId);
+        getUserById(requestorId);
+
+
+        int page = from / size;
+        Pageable pageable = PageRequest.of(page, size);
 
         return requestMapper.toDto(
-                requestRepository.findAllByRequestor_IdNotOrderByCreatedDesc(requestorId));
+                requestRepository.findAllByRequestor_IdNotOrderByCreatedDesc(requestorId, pageable));
     }
 
     public RequestReadDto findById(int requestId) {
@@ -53,7 +59,7 @@ public class RequestService {
         return requestMapper.toDto(request);
     }
 
-    private User checkIfUserExistsById(int userId) {
+    private User getUserById(int userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
     }

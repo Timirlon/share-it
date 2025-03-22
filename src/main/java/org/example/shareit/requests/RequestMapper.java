@@ -3,6 +3,7 @@ package org.example.shareit.requests;
 import lombok.RequiredArgsConstructor;
 import org.example.shareit.item.ItemDto;
 import org.example.shareit.item.ItemMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -41,6 +42,12 @@ public class RequestMapper {
 
     public List<RequestReadDto> toDto(List<Request> requests) {
         return requests.stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    public List<RequestReadDto> toDto(Page<Request> requestPage) {
+        return requestPage.stream()
                 .map(this::toDto)
                 .toList();
     }

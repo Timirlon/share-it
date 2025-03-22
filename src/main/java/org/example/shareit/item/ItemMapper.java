@@ -1,6 +1,5 @@
 package org.example.shareit.item;
 
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

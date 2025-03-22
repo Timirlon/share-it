@@ -12,7 +12,7 @@ import static org.example.shareit.utils.RequestConstants.USER_ID_REQUEST_HEADER;
 @RequiredArgsConstructor
 @RequestMapping("/requests")
 public class RequestController {
-    RequestService requestService;
+    private final RequestService requestService;
 
     @PostMapping
     public RequestReadDto create(

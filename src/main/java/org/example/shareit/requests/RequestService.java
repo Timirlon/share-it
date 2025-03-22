@@ -11,10 +11,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RequestService {
-    RequestRepository requestRepository;
-    UserRepository userRepository;
+    private final RequestRepository requestRepository;
+    private final UserRepository userRepository;
 
-    RequestMapper requestMapper;
+    private final RequestMapper requestMapper;
 
 
     public RequestReadDto create(RequestCreateDto dto, int requestorId) {

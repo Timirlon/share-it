@@ -1,11 +1,15 @@
 package org.example.shareit.requests;
 
+import lombok.RequiredArgsConstructor;
 import org.example.shareit.item.ItemDto;
 import org.example.shareit.item.ItemMapper;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Component
+@RequiredArgsConstructor
 public class RequestMapper {
     ItemMapper itemMapper;
 

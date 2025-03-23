@@ -1,10 +1,10 @@
 package org.example.shareit.item;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import static org.example.shareit.utils.RequestConstants.USER_ID_REQUEST_HEADER;
 
@@ -29,6 +29,7 @@ public class ItemController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ItemDto create(
             @Valid @RequestBody ItemDto item,
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {
@@ -51,6 +52,7 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
+    @ResponseStatus(HttpStatus.CREATED)
     public CommentReadDto addComment(
             @Valid @RequestBody CommentCreateDto comment,
             @PathVariable int itemId,

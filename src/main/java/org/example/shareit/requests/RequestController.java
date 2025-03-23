@@ -1,10 +1,10 @@
 package org.example.shareit.requests;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +18,7 @@ public class RequestController {
     private final RequestService requestService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public RequestReadDto create(
             @RequestBody @Valid RequestCreateDto request,
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {

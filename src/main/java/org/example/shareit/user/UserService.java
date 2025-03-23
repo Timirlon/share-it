@@ -61,8 +61,7 @@ public class UserService {
     }
 
     private void validateEmailIsNotTaken(String email) {
-        if (userRepository.findByEmail(email) != null) {
-            throw new DataConflictException("Данная эл.почта занята.");
-        }
+        userRepository.findByEmail(email).orElseThrow(
+                () -> new DataConflictException("Данная эл.почта занята."));
     }
 }

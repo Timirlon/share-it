@@ -1,6 +1,8 @@
 package org.example.shareit.user;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.example.shareit.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -39,5 +41,17 @@ public class UserServiceTest {
         assertEquals(user.getId(), foundUser.getId());
         assertEquals(user.getName(), foundUser.getName());
         assertEquals(user.getEmail(), foundUser.getEmail());
+    }
+
+    @Test
+    void findByIdFailTest() {
+        String expectedMessage = "Пользователь не найден.";
+        int wrongId = 999;
+
+        Mockito.when(userRepository.findById(wrongId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException ex = assertThrows(NotFoundException.class, () -> userService.findById(wrongId));
+        assertEquals(expectedMessage, ex.getMessage());
     }
 }

@@ -11,7 +11,7 @@ import org.example.shareit.user.UserDto;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingReadDto {
-    int id;
+    Integer id;
     String start;
     String end;
     ItemDto item;

@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentCreateDto {
-    int id;
+    Integer id;
 
     @NotBlank
     String text;

@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RequestReadDto {
-    int id;
+    Integer id;
     String description;
     LocalDateTime created;
     List<ItemDto> responseItems;

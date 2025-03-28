@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDto {
-    int id;
+    Integer id;
 
     @NotBlank(message = "Имя пользователя не может быть пустым!")
     String name;

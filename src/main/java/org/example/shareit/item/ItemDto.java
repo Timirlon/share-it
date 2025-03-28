@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemDto {
-    int id;
+    Integer id;
 
     @NotBlank(message = "Название товара не может быть пустым!")
     String name;

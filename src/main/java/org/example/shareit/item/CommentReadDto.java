@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentReadDto {
-    int id;
+    Integer id;
     String text;
     String itemName;
     String authorName;

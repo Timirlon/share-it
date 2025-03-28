@@ -2,7 +2,7 @@ package org.example.shareit.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.example.shareit.exceptions.NotFoundException;
+import org.example.shareit.users.dtos.UserCreateDto;
 import org.example.shareit.users.dtos.UserMapper;
 import org.example.shareit.users.dtos.UserReadDto;
 import org.junit.jupiter.api.Test;
@@ -104,7 +104,7 @@ public class UserControllerTest {
 
     @Test
     @SneakyThrows
-    void createTest() {
+    void createTestSuccess() {
         String userName = "test-create";
         String userEmail = "test-create@post.com";
 
@@ -136,5 +136,95 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(userId))
                 .andExpect(jsonPath("$.name").value(userName))
                 .andExpect(jsonPath("$.email").value(userEmail));
+    }
+
+    @Test
+    @SneakyThrows
+    void createWithBlankNameTest() {
+        String userName = "   ";
+        String userEmail = "test-create@post.com";
+
+        UserCreateDto userDto = new UserCreateDto();
+        userDto.setName(userName);
+        userDto.setEmail(userEmail);
+
+        Mockito.when(userRepository.save(Mockito.any(User.class)))
+                .thenAnswer(
+                        invocationOnMock -> {
+                            User returnUser = invocationOnMock.getArgument(0, User.class);
+                            returnUser.setId(1);
+                            returnUser.setName(userName);
+                            returnUser.setEmail(userEmail);
+
+                            return returnUser;
+                        });
+
+
+        String userDtoInJson = objectMapper.writeValueAsString(userDto);
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDtoInJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @SneakyThrows
+    void createWithEmailOfNullTest() {
+        String userName = "test-create";
+        String userEmail = null;
+
+        UserCreateDto userDto = new UserCreateDto();
+        userDto.setName(userName);
+        userDto.setEmail(userEmail);
+
+        Mockito.when(userRepository.save(Mockito.any(User.class)))
+                .thenAnswer(
+                        invocationOnMock -> {
+                            User returnUser = invocationOnMock.getArgument(0, User.class);
+                            returnUser.setId(1);
+                            returnUser.setName(userName);
+                            returnUser.setEmail(userEmail);
+
+                            return returnUser;
+                        });
+
+
+        String userDtoInJson = objectMapper.writeValueAsString(userDto);
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDtoInJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @SneakyThrows
+    void createWithInvalidEmailTest() {
+        String userName = "test-create";
+        String userEmail = "//test@create@invalid.email";
+
+        UserCreateDto userDto = new UserCreateDto();
+        userDto.setName(userName);
+        userDto.setEmail(userEmail);
+
+        Mockito.when(userRepository.save(Mockito.any(User.class)))
+                .thenAnswer(
+                        invocationOnMock -> {
+                            User returnUser = invocationOnMock.getArgument(0, User.class);
+                            returnUser.setId(1);
+                            returnUser.setName(userName);
+                            returnUser.setEmail(userEmail);
+
+                            return returnUser;
+                        });
+
+
+        String userDtoInJson = objectMapper.writeValueAsString(userDto);
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDtoInJson))
+                .andExpect(status().isBadRequest());
     }
 }

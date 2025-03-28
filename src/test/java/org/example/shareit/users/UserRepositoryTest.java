@@ -1,4 +1,4 @@
-package org.example.shareit.user;
+package org.example.shareit.users;
 
 import jakarta.persistence.EntityManager;
 import static org.junit.jupiter.api.Assertions.*;

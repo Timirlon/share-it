@@ -1,4 +1,4 @@
-package org.example.shareit.requests;
+package org.example.shareit.bookings;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -8,26 +8,29 @@ import org.example.shareit.items.Item;
 import org.example.shareit.users.User;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
 @Entity
-@Table(name = "requests")
-public class Request {
+@Table(name = "bookings")
+public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    String description;
+    @Column(name = "start_date")
+    LocalDateTime startDate;
 
-    LocalDateTime created;
+    @Column(name = "end_date")
+    LocalDateTime endDate;
 
     @ManyToOne
-    User requestor;
+    Item item;
 
-    @OneToMany(mappedBy = "request")
-    List<Item> responseItems = new ArrayList<>();
+    @ManyToOne
+    User booker;
+
+    @Enumerated(value = EnumType.STRING)
+    BookingStatus status;
 }

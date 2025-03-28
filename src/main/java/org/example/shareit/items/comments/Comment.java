@@ -1,4 +1,4 @@
-package org.example.shareit.requests;
+package org.example.shareit.items.comments;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -8,26 +8,24 @@ import org.example.shareit.items.Item;
 import org.example.shareit.users.User;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
 @Entity
-@Table(name = "requests")
-public class Request {
+@Table(name = "comments")
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    String description;
-
-    LocalDateTime created;
+    String text;
 
     @ManyToOne
-    User requestor;
+    Item item;
 
-    @OneToMany(mappedBy = "request")
-    List<Item> responseItems = new ArrayList<>();
+    @ManyToOne
+    User author;
+    
+    LocalDateTime created;
 }

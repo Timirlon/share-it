@@ -1,61 +1,58 @@
 package org.example.shareit.requests;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.example.shareit.exception.NotFoundException;
-import org.example.shareit.user.User;
-import org.example.shareit.user.UserRepository;
+import lombok.experimental.FieldDefaults;
+import org.example.shareit.exceptions.NotFoundException;
+import org.example.shareit.users.User;
+import org.example.shareit.users.UserRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+
+@Service
 public class RequestService {
-    private final RequestRepository requestRepository;
-    private final UserRepository userRepository;
-
-    private final RequestMapper requestMapper;
+    RequestRepository requestRepository;
+    UserRepository userRepository;
 
 
-    public RequestReadDto create(RequestCreateDto dto, int requestorId) {
-        Request request = requestMapper.fromDto(dto);
-
-        User requestor = getUserById(requestorId);
+    public Request create(Request request, int requestorId) {
+        User requestor = getUserByIdOrElseThrow(requestorId);
         request.setRequestor(requestor);
 
+        requestRepository.save(request);
 
-        Request readRequest = requestRepository.save(request);
-        return requestMapper.toDto(readRequest);
+        return request;
     }
 
-    public List<RequestReadDto> findAllByRequestorId(int requestorId) {
-        getUserById(requestorId);
+    public List<Request> findAllByRequestorId(int requestorId) {
+        getUserByIdOrElseThrow(requestorId);
 
-        return requestMapper.toDto(
-                requestRepository.findAllByRequestor_IdOrderByCreatedDesc(requestorId));
+        return requestRepository.findAllByRequestor_IdOrderByCreatedDesc(requestorId);
     }
 
-    public List<RequestReadDto> findAllByRequestorIdExcludingOrderByCreation(int requestorId, int from, int size) {
-        getUserById(requestorId);
-
+    public Page<Request> findAllByRequestorIdExcludingOrderByCreation(int requestorId, int from, int size) {
+        getUserByIdOrElseThrow(requestorId);
 
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
 
-        return requestMapper.toDto(
-                requestRepository.findAllByRequestor_IdNotOrderByCreatedDesc(requestorId, pageable));
+        return requestRepository.findAllByRequestor_IdNotOrderByCreatedDesc(
+                requestorId, pageable);
     }
 
-    public RequestReadDto findById(int requestId) {
-        Request request = requestRepository.findById(requestId)
+    public Request findById(int requestId) {
+        return requestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Запрос не найден."));
-
-        return requestMapper.toDto(request);
     }
 
-    private User getUserById(int userId) {
+    private User getUserByIdOrElseThrow(int userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
     }

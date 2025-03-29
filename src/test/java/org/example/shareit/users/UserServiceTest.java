@@ -3,13 +3,11 @@ package org.example.shareit.users;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.example.shareit.exceptions.NotFoundException;
-import org.example.shareit.users.dtos.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -22,9 +20,6 @@ public class UserServiceTest {
 
     @InjectMocks
     UserService userService;
-
-    @Spy
-    UserMapper userMapper;
 
     @Test
     void findAllTest() {

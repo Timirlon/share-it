@@ -2,6 +2,7 @@ package org.example.shareit.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.example.shareit.exceptions.NotFoundException;
 import org.example.shareit.users.dtos.UserCreateDto;
 import org.example.shareit.users.dtos.UserMapper;
 import org.example.shareit.users.dtos.UserReadDto;
@@ -14,17 +15,16 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest({UserController.class, UserService.class, UserMapper.class})
+@WebMvcTest({UserController.class, UserMapper.class})
 public class UserControllerTest {
     @MockitoBean
-    UserRepository userRepository;
+    UserService userService;
 
     @Autowired
     MockMvc mockMvc;
@@ -49,7 +49,7 @@ public class UserControllerTest {
         int expectedLength = 2;
 
 
-        Mockito.when(userRepository.findAll())
+        Mockito.when(userService.findAll())
                 .thenReturn(List.of(userOne, userTwo));
 
 
@@ -74,8 +74,8 @@ public class UserControllerTest {
         user.setEmail("test-1@mail.com");
 
 
-        Mockito.when(userRepository.findById(userId))
-                .thenReturn(Optional.of(user));
+        Mockito.when(userService.findById(userId))
+                .thenReturn(user);
 
 
         mockMvc.perform(get("/users/" + userId))
@@ -92,8 +92,8 @@ public class UserControllerTest {
         String expectedDesc = "Пользователь не найден.";
         int wrongId = 999;
 
-        Mockito.when(userRepository.findById(wrongId))
-                .thenReturn(Optional.empty());
+        Mockito.when(userService.findById(wrongId))
+                .thenThrow(new NotFoundException("Пользователь не найден."));
 
 
         mockMvc.perform(get("/users/" + wrongId))
@@ -115,7 +115,7 @@ public class UserControllerTest {
         int userId = 1;
 
 
-        Mockito.when(userRepository.save(Mockito.any(User.class)))
+        Mockito.when(userService.create(Mockito.any(User.class)))
                 .thenAnswer(
                         invocationOnMock -> {
                             User returnUser = invocationOnMock.getArgument(0, User.class);
@@ -148,7 +148,7 @@ public class UserControllerTest {
         userDto.setName(userName);
         userDto.setEmail(userEmail);
 
-        Mockito.when(userRepository.save(Mockito.any(User.class)))
+        Mockito.when(userService.create(Mockito.any(User.class)))
                 .thenAnswer(
                         invocationOnMock -> {
                             User returnUser = invocationOnMock.getArgument(0, User.class);
@@ -178,7 +178,7 @@ public class UserControllerTest {
         userDto.setName(userName);
         userDto.setEmail(userEmail);
 
-        Mockito.when(userRepository.save(Mockito.any(User.class)))
+        Mockito.when(userService.create(Mockito.any(User.class)))
                 .thenAnswer(
                         invocationOnMock -> {
                             User returnUser = invocationOnMock.getArgument(0, User.class);
@@ -208,7 +208,7 @@ public class UserControllerTest {
         userDto.setName(userName);
         userDto.setEmail(userEmail);
 
-        Mockito.when(userRepository.save(Mockito.any(User.class)))
+        Mockito.when(userService.create(Mockito.any(User.class)))
                 .thenAnswer(
                         invocationOnMock -> {
                             User returnUser = invocationOnMock.getArgument(0, User.class);

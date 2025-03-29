@@ -2,6 +2,7 @@ package org.example.shareit.users;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.example.shareit.exceptions.DataConflictException;
 import org.example.shareit.exceptions.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,5 +90,24 @@ public class UserServiceTest {
 
         assertEquals(requestUser.getName(), savedUser.getName());
         assertEquals(requestUser.getEmail(), savedUser.getEmail());
+    }
+
+    @Test
+    void createWithAlreadyTakenEmailTest() {
+        int firstUserId = 1;
+        String firstUserName = "create-test-1";
+        String firstUserEmail = "create-test-1@mail.com";
+
+        User user = new User();
+        user.setId(firstUserId);
+        user.setName(firstUserName);
+        user.setEmail(firstUserEmail);
+
+
+        Mockito.when(userRepository.findByEmail(firstUserEmail))
+                .thenReturn(Optional.of(user));
+
+
+        assertThrows(DataConflictException.class, () -> userService.create(user));
     }
 }

@@ -1,6 +1,8 @@
 package org.example.shareit.users;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.example.shareit.exceptions.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -25,7 +27,7 @@ public class UserServiceIT {
         userService.create(initialUser);
         int userId = initialUser.getId();
 
-        //Проверка по id
+        //Проверка, что объект существует
         User foundUser = userService.findById(userId);
 
         assertEquals(userId, foundUser.getId());
@@ -44,5 +46,36 @@ public class UserServiceIT {
         assertEquals(userId, updUser.getId());
         assertEquals(initialUserName, updUser.getName());
         assertEquals(updUserEmail, updUser.getEmail());
+    }
+
+    @Test
+    void deleteTest() {
+        //Создание объекта
+        String userName = "test-create";
+        String userEmail = "test-create@post.com";
+
+        User initialUser = new User();
+        initialUser.setName(userName);
+        initialUser.setEmail(userEmail);
+
+        userService.create(initialUser);
+        int userId = initialUser.getId();
+
+
+        User foundUser = userService.findById(userId);
+
+        assertEquals(userId, foundUser.getId());
+        assertEquals(userName, foundUser.getName());
+        assertEquals(userEmail, foundUser.getEmail());
+
+
+        User deletedUser = userService.deleteById(userId);
+
+        assertEquals(userId, deletedUser.getId());
+        assertEquals(userName, deletedUser.getName());
+        assertEquals(userEmail, deletedUser.getEmail());
+
+
+        assertThrows(NotFoundException.class, () -> userService.findById(userId));
     }
 }

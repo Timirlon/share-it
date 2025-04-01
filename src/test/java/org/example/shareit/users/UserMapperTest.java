@@ -4,6 +4,8 @@ import org.example.shareit.users.dtos.UserCreateDto;
 import org.example.shareit.users.dtos.UserMapper;
 import org.example.shareit.users.dtos.UserReadDto;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.example.shareit.users.dtos.UserUpdDto;
 import org.junit.jupiter.api.Test;
 
 public class UserMapperTest {
@@ -24,8 +26,22 @@ public class UserMapperTest {
     }
 
     @Test
-    void fromDtoTest() {
+    void fromCreateDtoTest() {
         UserCreateDto dto = new UserCreateDto();
+        dto.setName("test-name");
+        dto.setEmail("test-email");
+
+
+        User user = userMapper.fromDto(dto);
+
+
+        assertEquals(dto.getName(), user.getName());
+        assertEquals(dto.getEmail(), user.getEmail());
+    }
+
+    @Test
+    void fromUpdateDtoTest() {
+        UserUpdDto dto = new UserUpdDto();
         dto.setName("test-name");
         dto.setEmail("test-email");
 

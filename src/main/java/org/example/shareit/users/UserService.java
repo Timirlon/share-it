@@ -51,8 +51,8 @@ public class UserService {
             validateEmailIsNotTaken(user.getEmail());
         }
 
-
-        return userRepository.save(user);
+        userRepository.save(user);
+        return user;
     }
 
     public User deleteById(int userId) {

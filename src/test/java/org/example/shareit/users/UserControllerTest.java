@@ -6,6 +6,7 @@ import org.example.shareit.exceptions.NotFoundException;
 import org.example.shareit.users.dtos.UserCreateDto;
 import org.example.shareit.users.dtos.UserMapper;
 import org.example.shareit.users.dtos.UserReadDto;
+import org.example.shareit.users.dtos.UserUpdDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -172,11 +172,10 @@ public class UserControllerTest {
     @SneakyThrows
     void createWithEmailOfNullTest() {
         String userName = "test-create";
-        String userEmail = null;
 
         UserCreateDto userDto = new UserCreateDto();
         userDto.setName(userName);
-        userDto.setEmail(userEmail);
+        userDto.setEmail(null);
 
         Mockito.when(userService.create(Mockito.any(User.class)))
                 .thenAnswer(
@@ -184,7 +183,7 @@ public class UserControllerTest {
                             User returnUser = invocationOnMock.getArgument(0, User.class);
                             returnUser.setId(1);
                             returnUser.setName(userName);
-                            returnUser.setEmail(userEmail);
+                            returnUser.setEmail(null);
 
                             return returnUser;
                         });
@@ -226,5 +225,64 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userDtoInJson))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @SneakyThrows
+    void updateTest() {
+        int userId = 1;
+        String userName = "test-update-1";
+        String userEmail = "test-update-1@mail.com";
+
+        UserUpdDto userUpd = new UserUpdDto();
+        userUpd.setName(userName);
+
+
+        Mockito.when(userService.update(Mockito.anyInt(), Mockito.any(User.class)))
+                .thenAnswer(
+                        invocationOnMock -> {
+                            User returnUser = new User();
+                            returnUser.setId(userId);
+                            returnUser.setName(userName);
+                            returnUser.setEmail(userEmail);
+
+                            return returnUser;
+                        }
+                );
+
+
+        String userInJson = objectMapper.writeValueAsString(userUpd);
+
+        mockMvc.perform(patch("/users/" + userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userInJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId))
+                .andExpect(jsonPath("$.name").value(userName))
+                .andExpect(jsonPath("$.email").value(userEmail));
+    }
+
+    @Test
+    @SneakyThrows
+    void deleteTest() {
+        int userId = 1;
+        String userName = "test-delete-1";
+        String userEmail = "test-delete-1@mail.com";
+
+        User deleteUser = new User();
+        deleteUser.setId(userId);
+        deleteUser.setName(userName);
+        deleteUser.setEmail(userEmail);
+
+
+        Mockito.when(userService.deleteById(userId))
+                .thenReturn(deleteUser);
+
+
+        mockMvc.perform(delete("/users/" + userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId))
+                .andExpect(jsonPath("$.name").value(userName))
+                .andExpect(jsonPath("$.email").value(userEmail));
     }
 }

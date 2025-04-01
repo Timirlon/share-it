@@ -22,29 +22,29 @@ public class RequestService {
     UserRepository userRepository;
 
 
-    public Request create(Request request, int requestorId) {
-        User requestor = getUserByIdOrElseThrow(requestorId);
-        request.setRequestor(requestor);
+    public Request create(Request request, int requesterId) {
+        User requester = getUserByIdOrElseThrow(requesterId);
+        request.setRequester(requester);
 
         requestRepository.save(request);
 
         return request;
     }
 
-    public List<Request> findAllByRequestorId(int requestorId) {
-        getUserByIdOrElseThrow(requestorId);
+    public List<Request> findAllByRequesterId(int requesterId) {
+        getUserByIdOrElseThrow(requesterId);
 
-        return requestRepository.findAllByRequestor_IdOrderByCreatedDesc(requestorId);
+        return requestRepository.findAllByRequester_IdOrderByCreatedDesc(requesterId);
     }
 
-    public Page<Request> findAllByRequestorIdExcludingOrderByCreation(int requestorId, int from, int size) {
-        getUserByIdOrElseThrow(requestorId);
+    public Page<Request> findAllByRequesterIdExcludingOrderByCreation(int requesterId, int from, int size) {
+        getUserByIdOrElseThrow(requesterId);
 
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
 
-        return requestRepository.findAllByRequestor_IdNotOrderByCreatedDesc(
-                requestorId, pageable);
+        return requestRepository.findAllByRequester_IdNotOrderByCreatedDesc(
+                requesterId, pageable);
     }
 
     public Request findById(int requestId) {

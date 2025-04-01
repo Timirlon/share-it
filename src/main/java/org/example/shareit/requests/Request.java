@@ -26,7 +26,7 @@ public class Request {
     LocalDateTime created;
 
     @ManyToOne
-    User requestor;
+    User requester;
 
     @OneToMany(mappedBy = "request")
     List<Item> responseItems = new ArrayList<>();

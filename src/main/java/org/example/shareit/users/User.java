@@ -35,6 +35,6 @@ public class User {
     @OneToMany(mappedBy = "author")
     List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "requestor")
+    @OneToMany(mappedBy = "requester")
     List<Request> requests = new ArrayList<>();
 }

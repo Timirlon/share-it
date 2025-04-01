@@ -40,7 +40,7 @@ public class RequestController {
     public List<RequestReadDto> findAllOfMine(
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {
         return mapper.toDto(
-                requestService.findAllByRequestorId(userId));
+                requestService.findAllByRequesterId(userId));
     }
 
     @GetMapping("/all")
@@ -50,7 +50,7 @@ public class RequestController {
             @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size) {
 
         return mapper.toDto(
-                requestService.findAllByRequestorIdExcludingOrderByCreation(userId, from, size));
+                requestService.findAllByRequesterIdExcludingOrderByCreation(userId, from, size));
     }
 
     @GetMapping("/{requestId}")

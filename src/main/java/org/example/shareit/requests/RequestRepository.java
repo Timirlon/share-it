@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface RequestRepository extends JpaRepository<Request, Integer> {
-    List<Request> findAllByRequestor_IdOrderByCreatedDesc(int requestorId);
+    List<Request> findAllByRequester_IdOrderByCreatedDesc(int requesterId);
 
-    Page<Request> findAllByRequestor_IdNotOrderByCreatedDesc(int requestorId, Pageable pageable);
+    Page<Request> findAllByRequester_IdNotOrderByCreatedDesc(int requesterId, Pageable pageable);
 }

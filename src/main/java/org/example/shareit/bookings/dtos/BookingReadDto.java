@@ -7,12 +7,14 @@ import org.example.shareit.bookings.BookingStatus;
 import org.example.shareit.items.dtos.ItemReadDto;
 import org.example.shareit.users.dtos.UserReadDto;
 
+import java.time.LocalDateTime;
+
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingReadDto {
     Integer id;
-    String start;
-    String end;
+    LocalDateTime start;
+    LocalDateTime end;
     ItemReadDto item;
     UserReadDto booker;
     BookingStatus status;

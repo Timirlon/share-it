@@ -19,8 +19,8 @@ public class BookingMapper {
         BookingReadDto dto = new BookingReadDto();
 
         dto.setId(booking.getId());
-        dto.setStart(booking.getStartDate().toString());
-        dto.setEnd(booking.getEndDate().toString());
+        dto.setStart(booking.getStartDate());
+        dto.setEnd(booking.getEndDate());
         dto.setItem(itemMapper.toDto(booking.getItem()));
         dto.setBooker(userMapper.toDto(booking.getBooker()));
         dto.setStatus(booking.getStatus());

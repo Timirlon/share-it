@@ -46,7 +46,9 @@ public class UserService {
         if (user.getEmail() == null) {
             user.setEmail(oldUser.getEmail());
 
-        } else if (!user.getEmail().equals(oldUser.getEmail())) {
+        }
+
+        if (!user.getEmail().equals(oldUser.getEmail())) {
 
             validateEmailIsNotTaken(user.getEmail());
         }

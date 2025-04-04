@@ -5,10 +5,10 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS requests (
-                                        id SERIAL PRIMARY KEY,
-                                        description VARCHAR(1000) NOT NULL,
-                                        created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-                                        requestor_id INT REFERENCES users NOT NULL
+    id SERIAL PRIMARY KEY,
+    description VARCHAR(1000) NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    requester_id INT REFERENCES users NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS items (

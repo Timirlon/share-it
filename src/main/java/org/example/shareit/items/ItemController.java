@@ -49,7 +49,7 @@ public class ItemController {
             @Valid @RequestBody ItemCreateDto itemDto,
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {
         Item item = itemMapper.fromDto(itemDto);
-        int requestId = item.getRequest() == null ? 0 : item.getRequest().getId();
+        int requestId = itemDto.getRequestId();
 
 
         return itemMapper.toDto(

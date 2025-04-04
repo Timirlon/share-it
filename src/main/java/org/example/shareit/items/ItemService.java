@@ -52,7 +52,7 @@ public class ItemService {
 
         if (requestId != 0) {
             Request request = requestRepository.findById(requestId)
-                    .orElseThrow(() -> new NotFoundException("Запрос не найден"));
+                    .orElseThrow(() -> new NotFoundException("Запрос не найден."));
 
             item.setRequest(request);
         }
@@ -63,10 +63,10 @@ public class ItemService {
 
     public Item update(int itemId, Item patchItem, int userId) {
         Item oldItem = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Товар не найден"));
+                .orElseThrow(() -> new NotFoundException("Товар не найден."));
 
         if (oldItem.getOwner().getId() != userId) {
-            throw new NotFoundException("Товар не найден");
+            throw new NotFoundException("Товар не найден.");
         }
 
 

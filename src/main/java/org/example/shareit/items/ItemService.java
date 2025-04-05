@@ -90,7 +90,7 @@ public class ItemService {
     }
 
     public Page<Item> findByText(String text, int from, int size) {
-        if (text == null || text.isEmpty()) {
+        if (text == null || text.isBlank()) {
             return Page.empty();
         }
 
@@ -107,6 +107,8 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Товар не найден."));
 
+        //Нельзя оставлять комментарий к товару которым не пользовались
+        //проверка по userId и itemId, статус и дата старта в прошлом (т.е комментатор уже попользовался товаром)
         Booking booking = bookingRepository.findAllByBooker_IdAndItem_IdAndStatusAndStartDateBeforeOrderByStartDateAsc(
                 authorId, itemId, BookingStatus.APPROVED, LocalDateTime.now()).stream()
                 .findFirst()
@@ -117,6 +119,7 @@ public class ItemService {
         comment.setItem(item);
         comment.setCreated(LocalDateTime.now());
 
-        return commentRepository.save(comment);
+        commentRepository.save(comment);
+        return comment;
     }
 }

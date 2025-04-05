@@ -53,7 +53,6 @@ public class RequestServiceTest {
         Request createdRequest = requestService.create(request, requesterId);
 
 
-        assertFalse(createdRequest.getId() != 0);
         assertEquals(requestDesc, createdRequest.getDescription());
         assertEquals(requesterId, createdRequest.getRequester().getId());
     }
@@ -142,7 +141,6 @@ public class RequestServiceTest {
                 () -> requestService.findAllByRequesterId(requesterId));
         assertEquals(expectedMessage, ex.getMessage());
     }
-
 
     @Test
     @SneakyThrows

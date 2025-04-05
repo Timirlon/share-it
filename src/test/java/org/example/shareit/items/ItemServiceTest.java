@@ -1,8 +1,12 @@
 package org.example.shareit.items;
 
+import jakarta.validation.ValidationException;
 import lombok.SneakyThrows;
+import org.example.shareit.bookings.Booking;
 import org.example.shareit.bookings.BookingRepository;
+import org.example.shareit.bookings.BookingStatus;
 import org.example.shareit.exceptions.NotFoundException;
+import org.example.shareit.items.comments.Comment;
 import org.example.shareit.items.comments.CommentRepository;
 import org.example.shareit.requests.Request;
 import org.example.shareit.requests.RequestRepository;
@@ -14,6 +18,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -465,5 +471,190 @@ public class ItemServiceTest {
                 () -> itemService.update(itemId, initialItem, userId));
 
         assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
+    void findByTextTestSuccess() {
+        int expectedSize = 2;
+        String text = "get-test";
+        int page = 0;
+        int size = 5;
+
+        Item firstItem = new Item();
+        int firstId = 1;
+        String firstName = "get-test-1";
+        firstItem.setId(firstId);
+        firstItem.setName(firstName);
+
+        Item secondItem = new Item();
+        int secondId = 2;
+        String secondName = "get-test-2";
+        secondItem.setId(secondId);
+        secondItem.setName(secondName);
+
+        Mockito.when(itemRepository.findAllByText(
+                Mockito.anyString(), Mockito.any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(firstItem, secondItem)));
+
+
+        List<Item> foundItems = itemService.findByText(text, page, size).toList();
+
+
+        assertEquals(expectedSize, foundItems.size());
+        assertEquals(firstId, foundItems.get(0).getId());
+        assertEquals(firstName, foundItems.get(0).getName());
+        assertEquals(secondId, foundItems.get(1).getId());
+        assertEquals(secondName, foundItems.get(1).getName());
+    }
+
+    @Test
+    @SneakyThrows
+    void findByTextTestTextIsEmpty() {
+        int expectedSize = 0;
+        String text = "   ";
+        int page = 0;
+        int size = 5;
+
+        Page<Item> foundItems = itemService.findByText(text, page, size);
+
+        assertEquals(expectedSize, foundItems.getTotalElements());
+    }
+
+    @Test
+    @SneakyThrows
+    void findByTextTestTextIsNull() {
+        int expectedSize = 0;
+        String text = null;
+        int page = 0;
+        int size = 5;
+
+        Page<Item> foundItems = itemService.findByText(text, page, size);
+
+        assertEquals(expectedSize, foundItems.getTotalElements());
+    }
+
+    @Test
+    @SneakyThrows
+    void addCommentTestUserNotFoundFail() {
+        String expectedMessage = "Пользователь не найден.";
+
+        Comment comment = new Comment();
+        int itemId = 1;
+        int authorId = 1;
+
+        Mockito.when(userRepository.findById(authorId))
+                .thenReturn(Optional.empty());
+
+
+        NotFoundException e = assertThrows(
+                NotFoundException.class, () -> itemService.addComment(comment, itemId, authorId)
+        );
+
+        assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
+    void addCommentTestItemNotFoundFail() {
+        String expectedMessage = "Товар не найден.";
+
+        Comment comment = new Comment();
+        int itemId = 1;
+
+        int authorId = 1;
+        User author = new User();
+        author.setId(authorId);
+
+        Mockito.when(userRepository.findById(authorId))
+                .thenReturn(Optional.of(author));
+
+        Mockito.when(itemRepository.findById(itemId))
+                .thenReturn(Optional.empty());
+
+
+        NotFoundException e = assertThrows(
+                NotFoundException.class, () -> itemService.addComment(comment, itemId, authorId)
+        );
+
+        assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
+    void addCommentTestItemWasNeverBookedByUser() {
+        String expectedMessage = "Вы не можете оставлять отзыв на этот товар.";
+
+        Comment comment = new Comment();
+
+        int itemId = 1;
+        Item item = new Item();
+        item.setId(itemId);
+
+        int authorId = 1;
+        User author = new User();
+        author.setId(authorId);
+
+
+        Mockito.when(userRepository.findById(authorId))
+                .thenReturn(Optional.of(author));
+
+        Mockito.when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(item));
+
+        Mockito.when(bookingRepository.findAllByBooker_IdAndItem_IdAndStatusAndStartDateBeforeOrderByStartDateAsc(
+                Mockito.anyInt(), Mockito.anyInt(), Mockito.any(BookingStatus.class), Mockito.any(LocalDateTime.class)))
+                .thenReturn(List.of());
+
+
+        ValidationException e = assertThrows(ValidationException.class,
+                () -> itemService.addComment(comment, itemId, authorId));
+
+        assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
+    void addCommentTestSuccess() {
+        Comment comment = new Comment();
+        String commentText = "create-test-comment-text-1";
+        comment.setText(commentText);
+
+        int itemId = 1;
+        Item item = new Item();
+        item.setId(itemId);
+
+        int authorId = 1;
+        User author = new User();
+        author.setId(authorId);
+
+        int bookingId = 1;
+        LocalDateTime start = LocalDateTime.now().minusHours(2);
+        LocalDateTime end = LocalDateTime.now();
+        Booking booking = new Booking();
+        booking.setId(bookingId);
+        booking.setStartDate(start);
+        booking.setEndDate(end);
+        booking.setStatus(BookingStatus.APPROVED);
+        booking.setBooker(author);
+        booking.setItem(item);
+
+        Mockito.when(userRepository.findById(authorId))
+                .thenReturn(Optional.of(author));
+
+        Mockito.when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(item));
+
+        Mockito.when(bookingRepository.findAllByBooker_IdAndItem_IdAndStatusAndStartDateBeforeOrderByStartDateAsc(
+                        Mockito.anyInt(), Mockito.anyInt(), Mockito.any(BookingStatus.class), Mockito.any(LocalDateTime.class)))
+                .thenReturn(List.of(booking));
+
+
+        Comment returnedComment = itemService.addComment(comment, itemId, authorId);
+
+
+        assertEquals(commentText, returnedComment.getText());
+        assertEquals(itemId, returnedComment.getItem().getId());
+        assertEquals(authorId, returnedComment.getAuthor().getId());
     }
 }

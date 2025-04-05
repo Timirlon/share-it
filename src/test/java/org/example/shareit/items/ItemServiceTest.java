@@ -14,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -85,7 +84,7 @@ public class ItemServiceTest {
                 .thenReturn(List.of(firstItem, secondItem));
 
 
-        List<Item> foundItems = itemRepository.findAllByOwnerId(ownerId, PageRequest.of(from, size));
+        List<Item> foundItems = itemService.findAll(ownerId, from, size);
 
 
         assertEquals(expectedSize, foundItems.size());
@@ -120,7 +119,7 @@ public class ItemServiceTest {
                 .thenReturn(Optional.of(item));
 
 
-        Item foundItem = itemRepository.findById(itemId).orElseThrow();
+        Item foundItem = itemService.findById(itemId);
 
 
         assertEquals(itemId, foundItem.getId());
@@ -289,6 +288,181 @@ public class ItemServiceTest {
                 NotFoundException.class,
                 () -> itemService.create(item, ownerId, wrongRequestId)
         );
+
+        assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
+    void updateItemNameTestSuccess() {
+        int ownerId = 1;
+        String ownerName = "update-test-owner-name-1";
+        User owner = new User();
+        owner.setId(ownerId);
+        owner.setName(ownerName);
+
+        int itemId = 1;
+        String initialName = "update-test-item-name-1";
+        String initialDesc = "update-test-item-desc-1";
+        boolean initialAvailability = true;
+        String updatedName = "update-test-item-name-2";
+
+        Item initialItem = new Item();
+        initialItem.setId(itemId);
+        initialItem.setName(initialName);
+        initialItem.setDescription(initialDesc);
+        initialItem.setAvailable(initialAvailability);
+        initialItem.setOwner(owner);
+
+        Item updateItem = new Item();
+        updateItem.setName(updatedName);
+
+        Mockito.when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(initialItem));
+
+
+        Item resultItem = itemService.update(itemId, updateItem, ownerId);
+
+        assertEquals(itemId, resultItem.getId());
+        assertEquals(updatedName, resultItem.getName());
+        assertEquals(initialDesc, resultItem.getDescription());
+        assertEquals(initialAvailability, resultItem.getAvailable());
+        assertEquals(ownerId, resultItem.getOwner().getId());
+    }
+
+    @Test
+    @SneakyThrows
+    void updateItemDescTestSuccess() {
+        int ownerId = 1;
+        String ownerName = "update-test-owner-name-1";
+        User owner = new User();
+        owner.setId(ownerId);
+        owner.setName(ownerName);
+
+        int itemId = 1;
+        String initialName = "update-test-item-name-1";
+        String initialDesc = "update-test-item-desc-1";
+        boolean initialAvailability = true;
+        String updatedDesc = "update-test-item-desc-2";
+
+        Item initialItem = new Item();
+        initialItem.setId(itemId);
+        initialItem.setName(initialName);
+        initialItem.setDescription(initialDesc);
+        initialItem.setAvailable(initialAvailability);
+        initialItem.setOwner(owner);
+
+        Item updateItem = new Item();
+        updateItem.setDescription(updatedDesc);
+
+        Mockito.when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(initialItem));
+
+
+        Item resultItem = itemService.update(itemId, updateItem, ownerId);
+
+        assertEquals(itemId, resultItem.getId());
+        assertEquals(initialName, resultItem.getName());
+        assertEquals(updatedDesc, resultItem.getDescription());
+        assertEquals(initialAvailability, resultItem.getAvailable());
+        assertEquals(ownerId, resultItem.getOwner().getId());
+    }
+
+    @Test
+    @SneakyThrows
+    void updateItemAvailabilityTestSuccess() {
+        int ownerId = 1;
+        String ownerName = "update-test-owner-name-1";
+        User owner = new User();
+        owner.setId(ownerId);
+        owner.setName(ownerName);
+
+        int itemId = 1;
+        String initialName = "update-test-item-name-1";
+        String initialDesc = "update-test-item-desc-1";
+        boolean initialAvailability = true;
+        boolean updatedAvailability = false;
+
+        Item initialItem = new Item();
+        initialItem.setId(itemId);
+        initialItem.setName(initialName);
+        initialItem.setDescription(initialDesc);
+        initialItem.setAvailable(initialAvailability);
+        initialItem.setOwner(owner);
+
+        Item updateItem = new Item();
+        updateItem.setAvailable(updatedAvailability);
+
+        Mockito.when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(initialItem));
+
+
+        Item resultItem = itemService.update(itemId, updateItem, ownerId);
+
+        assertEquals(itemId, resultItem.getId());
+        assertEquals(initialName, resultItem.getName());
+        assertEquals(initialDesc, resultItem.getDescription());
+        assertEquals(updatedAvailability, resultItem.getAvailable());
+        assertEquals(ownerId, resultItem.getOwner().getId());
+    }
+
+    @Test
+    @SneakyThrows
+    void updateTestItemNotFoundFail() {
+        String expectedMessage = "Товар не найден.";
+        int wrongId = 999;
+        int ownerId = 0;
+        Item item = new Item();
+        item.setName("update-test-item-name-1");
+
+
+        Mockito.when(itemRepository.findById(wrongId))
+                .thenReturn(Optional.empty());
+
+
+        NotFoundException e = assertThrows(
+                NotFoundException.class,
+                () -> itemService.update(wrongId, item, ownerId));
+
+        assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
+    void updateTestUserIsNotOwnerFail() {
+        String expectedMessage = "Товар не найден.";
+
+        int userId = 999;
+
+        int ownerId = 1;
+        String ownerName = "update-test-owner-name-1";
+        User owner = new User();
+        owner.setId(ownerId);
+        owner.setName(ownerName);
+
+        int itemId = 1;
+        String initialName = "update-test-item-name-1";
+        String initialDesc = "update-test-item-desc-1";
+        boolean initialAvailability = true;
+        String updatedName = "update-test-item-name-2";
+
+        Item initialItem = new Item();
+        initialItem.setId(itemId);
+        initialItem.setName(initialName);
+        initialItem.setDescription(initialDesc);
+        initialItem.setAvailable(initialAvailability);
+        initialItem.setOwner(owner);
+
+        Item updateItem = new Item();
+        updateItem.setName(updatedName);
+
+        Mockito.when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(initialItem));
+
+
+        NotFoundException e = assertThrows(
+                NotFoundException.class,
+                () -> itemService.update(itemId, initialItem, userId));
 
         assertEquals(expectedMessage, e.getMessage());
     }

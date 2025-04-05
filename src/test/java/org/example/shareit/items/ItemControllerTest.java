@@ -251,7 +251,6 @@ public class ItemControllerTest {
         ItemCreateDto itemDto = new ItemCreateDto();
         itemDto.setName(itemName);
         itemDto.setDescription(itemDesc);
-        itemDto.setAvailable(isAvailable);
 
         Mockito.when(itemService.update(
                         Mockito.anyInt(), Mockito.any(Item.class), Mockito.anyInt()))

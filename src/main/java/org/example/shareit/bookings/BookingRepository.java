@@ -12,7 +12,7 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findAllByBooker_IdOrderByStartDateDesc(int bookerId, Pageable pageable);
 
     // CURRENT
-    List<Booking> findAllByBooker_IdAndStartDateGreaterThanEqualAndEndDateIsAfterOrderByStartDateDesc(int bookerId, LocalDateTime start, LocalDateTime end, Pageable pageable);
+    List<Booking> findAllByBooker_IdAndStartDateIsBeforeAndEndDateIsAfterOrderByStartDateDesc(int bookerId, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
     // PAST
     List<Booking> findAllByBooker_IdAndEndDateIsBeforeOrderByStartDateDesc(int bookerId, LocalDateTime end, Pageable pageable);
@@ -29,7 +29,7 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findAllByItem_Owner_IdOrderByStartDateDesc(int ownerId, Pageable pageable);
 
     // CURRENT
-    List<Booking> findAllByItem_Owner_IdAndStartDateGreaterThanEqualAndEndDateIsAfterOrderByStartDateDesc(int ownerId, LocalDateTime start, LocalDateTime end, Pageable pageable);
+    List<Booking> findAllByItem_Owner_IdAndStartDateIsBeforeAndEndDateIsAfterOrderByStartDateDesc(int ownerId, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
     // PAST
     List<Booking> findAllByItem_Owner_IdAndEndDateIsBeforeOrderByStartDateDesc(int ownerId, LocalDateTime end, Pageable pageable);

@@ -38,13 +38,13 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingReadDto approve(
+    public BookingReadDto updateStatus(
             @PathVariable int bookingId,
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId,
-            @RequestParam boolean approved) {
+            @RequestParam(name = "approved") boolean isApproved) {
 
         return mapper.toDto(
-                bookingService.approve(bookingId, userId, approved));
+                bookingService.updateStatus(bookingId, userId, isApproved));
     }
 
     @GetMapping("/{bookingId}")

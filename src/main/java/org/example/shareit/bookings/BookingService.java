@@ -46,7 +46,7 @@ public class BookingService {
         return booking;
     }
 
-    public Booking approve(int bookingId, int userId, boolean approved) {
+    public Booking updateStatus(int bookingId, int userId, boolean isApproved) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Запись не найдена."));
 
@@ -55,7 +55,7 @@ public class BookingService {
             throw new ForbiddenAccessException("Вы не можете одобрить запрос.");
         }
 
-        if (approved) {
+        if (isApproved) {
             booking.setStatus(BookingStatus.APPROVED);
         } else {
             booking.setStatus(BookingStatus.REJECTED);
@@ -80,8 +80,8 @@ public class BookingService {
         return booking;
     }
 
-    public List<Booking> findAllByBookerId(int userId, BookingFilteringState state, int from, int size) {
-        userRepository.findById(userId)
+    public List<Booking> findAllByBookerId(int bookerId, BookingFilteringState state, int from, int size) {
+        userRepository.findById(bookerId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
 
 
@@ -92,18 +92,18 @@ public class BookingService {
         LocalDateTime now = LocalDateTime.now();
 
         return switch (state) {
-            case ALL -> bookingRepository.findAllByBooker_IdOrderByStartDateDesc(userId, pageable);
+            case ALL -> bookingRepository.findAllByBooker_IdOrderByStartDateDesc(bookerId, pageable);
             case CURRENT ->
-                    bookingRepository.findAllByBooker_IdAndStartDateGreaterThanEqualAndEndDateIsAfterOrderByStartDateDesc(
-                            userId, now, now, pageable);
+                    bookingRepository.findAllByBooker_IdAndStartDateIsBeforeAndEndDateIsAfterOrderByStartDateDesc(
+                            bookerId, now, now, pageable);
             case PAST ->
-                    bookingRepository.findAllByBooker_IdAndEndDateIsBeforeOrderByStartDateDesc(userId, now, pageable);
+                    bookingRepository.findAllByBooker_IdAndEndDateIsBeforeOrderByStartDateDesc(bookerId, now, pageable);
             case FUTURE ->
-                    bookingRepository.findAllByBooker_IdAndStartDateIsAfterOrderByStartDateDesc(userId, now, pageable);
+                    bookingRepository.findAllByBooker_IdAndStartDateIsAfterOrderByStartDateDesc(bookerId, now, pageable);
             case WAITING ->
-                    bookingRepository.findAllByBooker_IdAndStatusOrderByStartDateDesc(userId, BookingStatus.WAITING, pageable);
+                    bookingRepository.findAllByBooker_IdAndStatusOrderByStartDateDesc(bookerId, BookingStatus.WAITING, pageable);
             case REJECTED ->
-                    bookingRepository.findAllByBooker_IdAndStatusOrderByStartDateDesc(userId, BookingStatus.REJECTED, pageable);
+                    bookingRepository.findAllByBooker_IdAndStatusOrderByStartDateDesc(bookerId, BookingStatus.REJECTED, pageable);
         };
     }
 
@@ -121,7 +121,7 @@ public class BookingService {
         return switch (state) {
             case ALL -> bookingRepository.findAllByItem_Owner_IdOrderByStartDateDesc(ownerId, pageable);
             case CURRENT ->
-                    bookingRepository.findAllByItem_Owner_IdAndStartDateGreaterThanEqualAndEndDateIsAfterOrderByStartDateDesc(
+                    bookingRepository.findAllByItem_Owner_IdAndStartDateIsBeforeAndEndDateIsAfterOrderByStartDateDesc(
                             ownerId, now, now, pageable);
             case FUTURE ->
                     bookingRepository.findAllByItem_Owner_IdAndStartDateIsAfterOrderByStartDateDesc(ownerId, now, pageable);

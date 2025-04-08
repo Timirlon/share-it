@@ -77,7 +77,12 @@
                 <configuration>
                     <output>file</output>
                     <excludes>
-                        <!--                        <exclude>**/SpringApplication.class</exclude>-->
+                        <exclude>**/ShareItApplication.class</exclude>
+                        <exclude>**/DataConflictException.class</exclude>
+                        <exclude>**/ErrorHandler.class</exclude>
+                        <exclude>**/ErrorResponse.class</exclude>
+                        <exclude>**/ForbiddenAccessException.class</exclude>
+                        <exclude>**/NotFoundException.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>

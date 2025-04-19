@@ -14,7 +14,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.util.Map;
 
-import static org.example.shareitserver.utils.RequestConstants.USER_ID_REQUEST_HEADER;
+import static org.example.shareitgateway.utils.HeaderUtils.getUserIdRequestHeader;
 
 @Component
 public class ItemClient {
@@ -76,7 +76,9 @@ public class ItemClient {
                 Map.of("text", text, "from", from, "size", size));
     }
 
-    public ResponseEntity<Object> addComment(CommentCreateDto commentDto, int itemId, int userId) {
+    public ResponseEntity<Object> addComment(
+            CommentCreateDto commentDto, int itemId, int userId) {
+
         HttpHeaders header = getUserIdRequestHeader(userId);
 
         return restTemplate.exchange(
@@ -85,11 +87,5 @@ public class ItemClient {
                 new HttpEntity<>(commentDto, header),
                 Object.class,
                 Map.of("itemId", itemId));
-    }
-
-    private HttpHeaders getUserIdRequestHeader(int userId) {
-        HttpHeaders header = new HttpHeaders();
-        header.add(USER_ID_REQUEST_HEADER, String.valueOf(userId));
-        return header;
     }
 }

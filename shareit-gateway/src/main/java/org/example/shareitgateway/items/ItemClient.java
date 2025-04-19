@@ -69,11 +69,11 @@ public class ItemClient {
 
     public ResponseEntity<Object> findByText(String text, int from, int size) {
         return restTemplate.exchange(
-                "/items?from={from}&size={size}",
+                "/items/search?text={text}&from={from}&size={size}",
                 HttpMethod.GET,
                 null,
                 Object.class,
-                Map.of("from", from, "size", size));
+                Map.of("text", text, "from", from, "size", size));
     }
 
     public ResponseEntity<Object> addComment(CommentCreateDto commentDto, int itemId, int userId) {

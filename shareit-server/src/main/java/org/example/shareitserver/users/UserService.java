@@ -26,7 +26,7 @@ public class UserService {
     }
 
     public User create(User user) {
-        validateEmailIsNotTaken(user.getEmail());
+//        validateEmailIsNotTaken(user.getEmail());
 
         userRepository.save(user);
         return user;

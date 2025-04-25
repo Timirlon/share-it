@@ -1,10 +1,9 @@
 package org.example.shareitserver.bookings;
 
-import jakarta.validation.ValidationException;
+import org.example.shareitserver.exceptions.ValidationException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.example.shareitserver.exceptions.ForbiddenAccessException;
 import org.example.shareitserver.exceptions.NotFoundException;
 import org.example.shareitserver.items.Item;
 import org.example.shareitserver.items.ItemRepository;
@@ -27,6 +26,12 @@ public class BookingService {
     ItemRepository itemRepository;
 
     public Booking create(Booking booking, int userId, int bookedItemId) {
+        if (booking.getEndDate().isBefore(booking.getStartDate())
+        || booking.getEndDate().isEqual(booking.getStartDate())) {
+            throw new ValidationException("Некорректная дата или время окончания брони.");
+        }
+
+
         booking.setStatus(BookingStatus.WAITING);
 
         User booker = userRepository.findById(userId)
@@ -35,6 +40,11 @@ public class BookingService {
 
         Item bookedItem = itemRepository.findById(bookedItemId)
                 .orElseThrow(() -> new NotFoundException("Товар не найден."));
+
+
+        if (userId == bookedItem.getOwner().getId()) {
+            throw new NotFoundException("Товар не найден");
+        }
 
         if (!bookedItem.getAvailable()) {
             throw new ValidationException("Товар недоступен.");
@@ -52,7 +62,12 @@ public class BookingService {
 
 
         if (userId != booking.getItem().getOwner().getId()) {
-            throw new ForbiddenAccessException("Вы не можете одобрить запрос.");
+            throw new NotFoundException("Запись не найдена.");
+        }
+
+        if (isApproved && booking.getStatus() == BookingStatus.APPROVED
+        || !isApproved && booking.getStatus() == BookingStatus.REJECTED) {
+            throw new ValidationException("Статусу записи уже задано данное значение.");
         }
 
         if (isApproved) {

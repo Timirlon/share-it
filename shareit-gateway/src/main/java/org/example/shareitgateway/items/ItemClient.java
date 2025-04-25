@@ -20,7 +20,7 @@ import static org.example.shareitgateway.utils.HeaderUtils.getUserIdRequestHeade
 public class ItemClient {
     private final RestTemplate restTemplate;
 
-    public ItemClient(@Value("${shareitserver.server.url") String url,
+    public ItemClient(@Value("${shareitserver.server.url}") String url,
                       RestTemplateBuilder builder) {
 
         this.restTemplate = builder

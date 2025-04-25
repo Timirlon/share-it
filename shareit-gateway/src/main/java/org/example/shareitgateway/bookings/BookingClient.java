@@ -1,6 +1,5 @@
 package org.example.shareitgateway.bookings;
 
-import org.example.shareitserver.bookings.BookingFilteringState;
 import org.example.shareitserver.bookings.dtos.BookingCreateDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -20,7 +19,7 @@ import static org.example.shareitgateway.utils.HeaderUtils.getUserIdRequestHeade
 public class BookingClient {
     private final RestTemplate restTemplate;
 
-    public BookingClient(@Value("${shareitserver.server.url") String url,
+    public BookingClient(@Value("${shareitserver.server.url}") String url,
                          RestTemplateBuilder builder) {
 
         this.restTemplate = builder
@@ -64,7 +63,7 @@ public class BookingClient {
     }
 
     public ResponseEntity<Object> findMyBookings(
-            int userId, BookingFilteringState state,
+            int userId, String filteringState,
             int from, int size) {
 
         HttpHeaders header = getUserIdRequestHeader(userId);
@@ -74,12 +73,12 @@ public class BookingClient {
                 HttpMethod.GET,
                 new HttpEntity<>(null, header),
                 Object.class,
-                Map.of("state", state, "from", from, "size", size)
+                Map.of("state", filteringState, "from", from, "size", size)
         );
     }
 
     public ResponseEntity<Object> findBookingsOfMyItem(
-            int userId, BookingFilteringState state,
+            int userId, String filteringState,
             int from, int size) {
 
         HttpHeaders header = getUserIdRequestHeader(userId);
@@ -89,7 +88,7 @@ public class BookingClient {
                 HttpMethod.GET,
                 new HttpEntity<>(null, header),
                 Object.class,
-                Map.of("state", state, "from", from, "size", size)
+                Map.of("state", filteringState, "from", from, "size", size)
         );
     }
 }

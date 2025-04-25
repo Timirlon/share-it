@@ -1,6 +1,5 @@
 package org.example.shareitserver.items;
 
-import jakarta.validation.ValidationException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -8,6 +7,7 @@ import org.example.shareitserver.bookings.Booking;
 import org.example.shareitserver.bookings.BookingRepository;
 import org.example.shareitserver.bookings.BookingStatus;
 import org.example.shareitserver.exceptions.NotFoundException;
+import org.example.shareitserver.exceptions.ValidationException;
 import org.example.shareitserver.items.comments.*;
 import org.example.shareitserver.requests.Request;
 import org.example.shareitserver.requests.RequestRepository;

@@ -76,7 +76,6 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    @ResponseStatus(HttpStatus.CREATED)
     public CommentReadDto addComment(
             @Valid @RequestBody CommentCreateDto commentDto,
             @PathVariable int itemId,

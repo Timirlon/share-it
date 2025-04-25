@@ -3,7 +3,6 @@ package org.example.shareitgateway.bookings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.example.shareitserver.bookings.BookingFilteringState;
 import org.example.shareitserver.bookings.dtos.BookingCreateDto;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +45,7 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<Object> findMyBookings(
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId,
-            @RequestParam(defaultValue = "ALL") BookingFilteringState state,
+            @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(defaultValue = "0") @Min(value = 0) int from,
             @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size) {
 
@@ -56,7 +55,7 @@ public class BookingController {
     @GetMapping("/owner")
     public ResponseEntity<Object> findBookingsOfMyItem(
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId,
-            @RequestParam(defaultValue = "ALL", required = false) BookingFilteringState state,
+            @RequestParam(defaultValue = "ALL", required = false) String state,
             @RequestParam(defaultValue = "0") @Min(value = 0) int from,
             @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size) {
 
@@ -67,7 +66,7 @@ public class BookingController {
     public ResponseEntity<Object> handleHttpRequest(HttpClientErrorException ex) {
         return new ResponseEntity<>(
                 ex.getResponseBodyAsString(),
-                ex.getResponseHeaders(),
+//                ex.getResponseHeaders(),
                 ex.getStatusCode());
     }
 }

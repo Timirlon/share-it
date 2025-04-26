@@ -1,13 +1,12 @@
 package org.example.shareitserver.bookings;
 
-import jakarta.validation.ValidationException;
 import lombok.SneakyThrows;
-import org.example.shareitserver.exceptions.ForbiddenAccessException;
 import org.example.shareitserver.exceptions.NotFoundException;
 import org.example.shareitserver.items.Item;
 import org.example.shareitserver.items.ItemRepository;
 import org.example.shareitserver.users.User;
 import org.example.shareitserver.users.UserRepository;
+import org.example.shareitserver.exceptions.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -93,15 +92,23 @@ public class BookingServiceTest {
         String expectedMessage = "Товар недоступен.";
 
         Booking booking = new Booking();
+        booking.setStartDate(LocalDateTime.now());
+        booking.setEndDate(LocalDateTime.now().plusHours(10));
+
+        User booker = new User();
+        int bookerId = 1;
+        booker.setId(bookerId);
+
+        User owner = new User();
+        int ownerId = 2;
+        owner.setId(ownerId);
 
         Item bookedItem = new Item();
         int bookedItemId = 1;
         bookedItem.setId(bookedItemId);
         bookedItem.setAvailable(false);
+        bookedItem.setOwner(owner);
 
-        User booker = new User();
-        int bookerId = 1;
-        booker.setId(bookerId);
 
         Mockito.when(userRepository.findById(bookerId))
                 .thenReturn(Optional.of(booker));
@@ -127,14 +134,19 @@ public class BookingServiceTest {
         booking.setStartDate(LocalDateTime.now());
         booking.setEndDate(LocalDateTime.now().plusHours(10));
 
+        User booker = new User();
+        int bookerId = 1;
+        booker.setId(bookerId);
+
+        User owner = new User();
+        int ownerId = 2;
+        owner.setId(ownerId);
+
         Item bookedItem = new Item();
         int bookedItemId = 1;
         bookedItem.setId(bookedItemId);
         bookedItem.setAvailable(true);
-
-        User booker = new User();
-        int bookerId = 1;
-        booker.setId(bookerId);
+        bookedItem.setOwner(owner);
 
         Mockito.when(userRepository.findById(bookerId))
                 .thenReturn(Optional.of(booker));
@@ -177,7 +189,7 @@ public class BookingServiceTest {
     @Test
     @SneakyThrows
     void updateStatusTestApprovedByWrongUser() {
-        String expectedMessage = "Вы не можете одобрить запрос.";
+        String expectedMessage = "Запись не найдена.";
 
         User owner = new User();
         int ownerId = 1;
@@ -201,8 +213,8 @@ public class BookingServiceTest {
                 .thenReturn(Optional.of(booking));
 
 
-        ForbiddenAccessException e = assertThrows(
-                ForbiddenAccessException.class,
+        NotFoundException e = assertThrows(
+                NotFoundException.class,
                 () -> bookingService.updateStatus(bookingId, wrongUserId, isApproved)
         );
 

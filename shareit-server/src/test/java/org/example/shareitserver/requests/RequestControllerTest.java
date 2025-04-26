@@ -8,6 +8,7 @@ import org.example.shareitserver.items.dtos.ItemMapper;
 import org.example.shareitserver.requests.dtos.RequestCreateDto;
 import org.example.shareitserver.requests.dtos.RequestMapper;
 import org.example.shareitserver.users.User;
+import org.example.shareitserver.users.dtos.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import static org.example.shareitserver.utils.RequestConstants.USER_ID_REQUEST_H
 import java.time.LocalDateTime;
 import java.util.List;
 
-@WebMvcTest({RequestController.class, RequestMapper.class, ItemMapper.class, CommentMapper.class})
+@WebMvcTest({RequestController.class, RequestMapper.class, ItemMapper.class, CommentMapper.class, UserMapper.class})
 public class RequestControllerTest {
     static final String BASE_URL = "/requests";
 
@@ -165,6 +166,8 @@ public class RequestControllerTest {
     @Test
     @SneakyThrows
     void findById() {
+        int userId = 1;
+
         int requestId = 1;
         String requestDesc = "get-test-desc-1";
 
@@ -188,11 +191,12 @@ public class RequestControllerTest {
         request.setResponseItems(List.of(item));
 
 
-        Mockito.when(requestService.findById(requestId))
+        Mockito.when(requestService.findById(requestId, userId))
                 .thenReturn(request);
 
 
-        mockMvc.perform(get(BASE_URL + "/" + requestId))
+        mockMvc.perform(get(BASE_URL + "/" + requestId)
+                        .header(USER_ID_REQUEST_HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(requestId))
                 .andExpect(jsonPath("$.description").value(requestDesc))

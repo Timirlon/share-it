@@ -9,6 +9,7 @@ import org.example.shareitserver.items.dtos.ItemCreateDto;
 import org.example.shareitserver.items.dtos.ItemMapper;
 import org.example.shareitserver.requests.Request;
 import org.example.shareitserver.users.User;
+import org.example.shareitserver.users.dtos.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.example.shareitserver.utils.RequestConstants.USER_ID_REQUEST_HEADER;
 
-@WebMvcTest({ItemController.class, ItemMapper.class, CommentMapper.class})
+@WebMvcTest({ItemController.class, ItemMapper.class, CommentMapper.class, UserMapper.class})
 public class ItemControllerTest {
     @MockitoBean
     ItemService itemService;
@@ -87,12 +88,12 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.[0].name").value(firstItemName))
                 .andExpect(jsonPath("$.[0].description").value(firstItemDesc))
                 .andExpect(jsonPath("$.[0].available").value(isAvailable))
-                .andExpect(jsonPath("$.[0].owner").value(ownerName))
+                .andExpect(jsonPath("$.[0].owner.name").value(ownerName))
                 .andExpect(jsonPath("$.[1].id").value(secondItemId))
                 .andExpect(jsonPath("$.[1].name").value(secondItemName))
                 .andExpect(jsonPath("$.[1].description").value(secondItemDesc))
                 .andExpect(jsonPath("$.[1].available").value(isAvailable))
-                .andExpect(jsonPath("$.[1].owner").value(ownerName));
+                .andExpect(jsonPath("$.[1].owner.name").value(ownerName));
     }
 
     @Test
@@ -101,6 +102,8 @@ public class ItemControllerTest {
         String ownerName = "get-test-owner-name-1";
         User owner = new User();
         owner.setName(ownerName);
+
+        int userId = 1;
 
         int itemId = 1;
         String itemName = "get-test-item-name-1";
@@ -115,17 +118,18 @@ public class ItemControllerTest {
         item.setOwner(owner);
 
 
-        Mockito.when(itemService.findById(itemId))
+        Mockito.when(itemService.findById(itemId, userId))
                 .thenReturn(item);
 
 
-        mockMvc.perform(get(BASE_URL + "/" + itemId))
+        mockMvc.perform(get(BASE_URL + "/" + itemId)
+                        .header(USER_ID_REQUEST_HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(itemId))
                 .andExpect(jsonPath("$.name").value(itemName))
                 .andExpect(jsonPath("$.description").value(itemDesc))
                 .andExpect(jsonPath("$.available").value(isAvailable))
-                .andExpect(jsonPath("$.owner").value(ownerName));
+                .andExpect(jsonPath("$.owner.name").value(ownerName));
     }
 
     @Test
@@ -178,7 +182,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name").value(itemName))
                 .andExpect(jsonPath("$.description").value(itemDesc))
                 .andExpect(jsonPath("$.available").value(isAvailable))
-                .andExpect(jsonPath("$.owner").value(ownerName))
+                .andExpect(jsonPath("$.owner.name").value(ownerName))
                 .andExpect(jsonPath("$.requestId").value(requestId));
     }
 
@@ -223,7 +227,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name").value(itemName))
                 .andExpect(jsonPath("$.description").value(itemDesc))
                 .andExpect(jsonPath("$.available").value(isAvailable))
-                .andExpect(jsonPath("$.owner").value(ownerName))
+                .andExpect(jsonPath("$.owner.name").value(ownerName))
                 .andExpect(jsonPath("$.requestId").doesNotExist());
     }
 
@@ -267,7 +271,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name").value(itemName))
                 .andExpect(jsonPath("$.description").value(itemDesc))
                 .andExpect(jsonPath("$.available").value(isAvailable))
-                .andExpect(jsonPath("$.owner").value(ownerName));
+                .andExpect(jsonPath("$.owner.name").value(ownerName));
     }
 
     @Test
@@ -320,12 +324,12 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.[0].name").value(firstItemName))
                 .andExpect(jsonPath("$.[0].description").value(firstItemDesc))
                 .andExpect(jsonPath("$.[0].available").value(isAvailable))
-                .andExpect(jsonPath("$.[0].owner").value(ownerName))
+                .andExpect(jsonPath("$.[0].owner.name").value(ownerName))
                 .andExpect(jsonPath("$.[1].id").value(secondItemId))
                 .andExpect(jsonPath("$.[1].name").value(secondItemName))
                 .andExpect(jsonPath("$.[1].description").value(secondItemDesc))
                 .andExpect(jsonPath("$.[1].available").value(isAvailable))
-                .andExpect(jsonPath("$.[1].owner").value(ownerName));
+                .andExpect(jsonPath("$.[1].owner.name").value(ownerName));
     }
 
     @Test
@@ -369,7 +373,7 @@ public class ItemControllerTest {
                     .contentType(APPLICATION_JSON)
                     .content(commentAsJson)
                     .header(USER_ID_REQUEST_HEADER, authorId))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(commentId))
                 .andExpect(jsonPath("$.text").value(commentText))
                 .andExpect(jsonPath("$.itemName").value(itemName))

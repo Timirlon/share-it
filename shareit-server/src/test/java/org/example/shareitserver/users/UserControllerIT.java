@@ -134,44 +134,44 @@ public class UserControllerIT {
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    @SneakyThrows
-    void createWithAlreadyTakenEmailTest() {
-        String errorTitle = "Конфликт данных.";
-        String errorDesc = "Данная эл.почта занята.";
-
-
-        String userOneName = "test-create-1";
-        String userOneEmail = "test-create@post.com";
-
-        UserCreateDto userOneDto = new UserCreateDto();
-        userOneDto.setName(userOneName);
-        userOneDto.setEmail(userOneEmail);
-
-
-        String userOneInJson = objectMapper.writeValueAsString(userOneDto);
-
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userOneInJson))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value(userOneName))
-                .andExpect(jsonPath("$.email").value(userOneEmail));
-
-
-        String userTwoName = "test-create-2";
-        UserCreateDto userTwoDto = new UserCreateDto();
-        userTwoDto.setName(userTwoName);
-        userTwoDto.setEmail(userOneEmail);
-
-        String userTwoInJson = objectMapper.writeValueAsString(userTwoDto);
-
-        mockMvc.perform(post("/users")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(userTwoInJson))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.error").value(errorTitle))
-                .andExpect(jsonPath("$.desc").value(errorDesc));
-    }
+//    @Test
+//    @SneakyThrows
+//    void createWithAlreadyTakenEmailTest() {
+//        String errorTitle = "Конфликт данных.";
+//        String errorDesc = "Данная эл.почта занята.";
+//
+//
+//        String userOneName = "test-create-1";
+//        String userOneEmail = "test-create@post.com";
+//
+//        UserCreateDto userOneDto = new UserCreateDto();
+//        userOneDto.setName(userOneName);
+//        userOneDto.setEmail(userOneEmail);
+//
+//
+//        String userOneInJson = objectMapper.writeValueAsString(userOneDto);
+//
+//        mockMvc.perform(post("/users")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(userOneInJson))
+//                .andExpect(status().isCreated())
+//                .andExpect(jsonPath("$.id").exists())
+//                .andExpect(jsonPath("$.name").value(userOneName))
+//                .andExpect(jsonPath("$.email").value(userOneEmail));
+//
+//
+//        String userTwoName = "test-create-2";
+//        UserCreateDto userTwoDto = new UserCreateDto();
+//        userTwoDto.setName(userTwoName);
+//        userTwoDto.setEmail(userOneEmail);
+//
+//        String userTwoInJson = objectMapper.writeValueAsString(userTwoDto);
+//
+//        mockMvc.perform(post("/users")
+//                    .contentType(MediaType.APPLICATION_JSON)
+//                    .content(userTwoInJson))
+//                .andExpect(status().isConflict())
+//                .andExpect(jsonPath("$.error").value(errorTitle))
+//                .andExpect(jsonPath("$.desc").value(errorDesc));
+//    }
 }

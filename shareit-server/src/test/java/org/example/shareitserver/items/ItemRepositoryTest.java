@@ -46,7 +46,7 @@ public class ItemRepositoryTest {
         itemRepository.save(secondItem);
 
 
-        List<Item> found = itemRepository.findAllByOwnerId(
+        List<Item> found = itemRepository.findAllByOwnerId_OrderById(
                 owner.getId(), PageRequest.of(0, 5));
 
 

@@ -218,11 +218,14 @@ public class RequestServiceTest {
         request.setCreated(now);
 
 
+        Mockito.when(userRepository.findById(requesterId))
+                .thenReturn(Optional.of(requester));
+
         Mockito.when(requestRepository.findById(requestId))
                 .thenReturn(Optional.of(request));
 
 
-        Request foundRequest = requestService.findById(requestId);
+        Request foundRequest = requestService.findById(requestId, requesterId);
 
         assertEquals(requestId, foundRequest.getId());
         assertEquals(requestDesc, foundRequest.getDescription());
@@ -233,16 +236,23 @@ public class RequestServiceTest {
     @Test
     @SneakyThrows
     void findByIdTestRequestNotFoundFail() {
+        int requesterId = 1;
+        User requester = new User();
+        requester.setId(requesterId);
+
         String expectedMessage = "Запрос не найден.";
         int requestId = 1;
 
+
+        Mockito.when(userRepository.findById(requesterId))
+                .thenReturn(Optional.of(requester));
 
         Mockito.when(requestRepository.findById(requestId))
                 .thenReturn(Optional.empty());
 
 
         NotFoundException ex = assertThrows(NotFoundException.class,
-                () -> requestService.findById(requestId));
+                () -> requestService.findById(requestId, requesterId));
 
         assertEquals(expectedMessage, ex.getMessage());
     }

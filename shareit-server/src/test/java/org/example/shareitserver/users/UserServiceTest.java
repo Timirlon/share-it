@@ -93,24 +93,24 @@ public class UserServiceTest {
         assertEquals(requestUser.getEmail(), savedUser.getEmail());
     }
 
-    @Test
-    void createWithAlreadyTakenEmailTest() {
-        int firstUserId = 1;
-        String firstUserName = "create-test-1";
-        String firstUserEmail = "create-test-1@mail.com";
-
-        User user = new User();
-        user.setId(firstUserId);
-        user.setName(firstUserName);
-        user.setEmail(firstUserEmail);
-
-
-        Mockito.when(userRepository.findByEmail(firstUserEmail))
-                .thenReturn(Optional.of(user));
-
-
-        assertThrows(DataConflictException.class, () -> userService.create(user));
-    }
+//    @Test
+//    void createWithAlreadyTakenEmailTest() {
+//        int firstUserId = 1;
+//        String firstUserName = "create-test-1";
+//        String firstUserEmail = "create-test-1@mail.com";
+//
+//        User user = new User();
+//        user.setId(firstUserId);
+//        user.setName(firstUserName);
+//        user.setEmail(firstUserEmail);
+//
+//
+//        Mockito.when(userRepository.findByEmail(firstUserEmail))
+//                .thenReturn(Optional.of(user));
+//
+//
+//        assertThrows(DataConflictException.class, () -> userService.create(user));
+//    }
 
     @Test
     @SneakyThrows

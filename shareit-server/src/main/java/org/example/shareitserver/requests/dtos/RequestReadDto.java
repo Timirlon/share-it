@@ -14,5 +14,5 @@ public class RequestReadDto {
     Integer id;
     String description;
     LocalDateTime created;
-    List<ItemReadDto> responseItems;
+    List<ItemReadDto> items;
 }

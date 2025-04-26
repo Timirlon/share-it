@@ -3,7 +3,10 @@ package org.example.shareitserver.items.dtos;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import org.example.shareitserver.bookings.dtos.BookingBaseReadDto;
+import org.example.shareitserver.bookings.dtos.BookingReadDto;
 import org.example.shareitserver.items.comments.dtos.CommentReadDto;
+import org.example.shareitserver.users.dtos.UserReadDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +24,11 @@ public class ItemReadDto {
 
     List<CommentReadDto> comments = new ArrayList<>();
 
-    String owner;
+    UserReadDto owner;
 
     Integer requestId;
+
+    BookingBaseReadDto lastBooking;
+
+    BookingBaseReadDto nextBooking;
 }

@@ -1,6 +1,8 @@
 package org.example.shareitserver.bookings.dtos;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.example.shareitserver.bookings.Booking;
 import org.example.shareitserver.items.dtos.ItemMapper;
 import org.example.shareitserver.users.dtos.UserMapper;
@@ -9,11 +11,13 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 import java.util.List;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+
 @Component
 @RequiredArgsConstructor
 public class BookingMapper {
-    private final ItemMapper itemMapper;
-    private final UserMapper userMapper;
+    UserMapper userMapper;
+    ItemMapper itemMapper;
 
     public BookingReadDto toDto(Booking booking) {
         BookingReadDto dto = new BookingReadDto();
@@ -21,9 +25,9 @@ public class BookingMapper {
         dto.setId(booking.getId());
         dto.setStart(booking.getStartDate());
         dto.setEnd(booking.getEndDate());
-        dto.setItem(itemMapper.toDto(booking.getItem()));
         dto.setBooker(userMapper.toDto(booking.getBooker()));
         dto.setStatus(booking.getStatus());
+        dto.setItem(itemMapper.toDto(booking.getItem()));
 
 
         return dto;

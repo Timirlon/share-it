@@ -37,7 +37,7 @@ public class ItemService {
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
 
-        return itemRepository.findAllByOwnerId(ownerId, pageable);
+        return itemRepository.findAllByOwnerId_OrderById(ownerId, pageable);
     }
 
     public Item findById(int id) {

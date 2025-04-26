@@ -54,8 +54,9 @@ public class RequestController {
     }
 
     @GetMapping("/{requestId}")
-    public RequestReadDto findById(@PathVariable int requestId) {
+    public RequestReadDto findById(@PathVariable int requestId,
+                                   @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {
         return mapper.toDto(
-                requestService.findById(requestId));
+                requestService.findById(requestId, userId));
     }
 }

@@ -47,9 +47,16 @@ public class RequestService {
                 requesterId, pageable);
     }
 
-    public Request findById(int requestId) {
-        return requestRepository.findById(requestId)
+    public Request findById(int requestId, int userId) {
+        Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Запрос не найден."));
+
+
+        if (request.getRequester().getId() == userId) {
+            return request;
+        }
+
+        throw new NotFoundException("Запрос не найден.");
     }
 
     private User getUserByIdOrElseThrow(int userId) {

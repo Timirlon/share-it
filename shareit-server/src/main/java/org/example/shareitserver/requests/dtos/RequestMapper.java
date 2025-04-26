@@ -25,7 +25,7 @@ public class RequestMapper {
 
         if (!request.getResponseItems().isEmpty()) {
             List<ItemReadDto> itemDtos = itemMapper.toDto(request.getResponseItems());
-            dto.setResponseItems(itemDtos);
+            dto.setItems(itemDtos);
         }
 
         return dto;

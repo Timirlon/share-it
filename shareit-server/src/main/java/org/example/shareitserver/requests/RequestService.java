@@ -34,29 +34,24 @@ public class RequestService {
     public List<Request> findAllByRequesterId(int requesterId) {
         getUserByIdOrElseThrow(requesterId);
 
-        return requestRepository.findAllByRequester_IdOrderByCreatedDesc(requesterId);
+        return requestRepository.findAllByRequesterId_OrderByCreatedDesc(requesterId);
     }
 
-    public Page<Request> findAllByRequesterIdExcludingOrderByCreation(int requesterId, int from, int size) {
+    public Page<Request> findAllByRequesterIdNot_OrderByCreated(int requesterId, int from, int size) {
         getUserByIdOrElseThrow(requesterId);
 
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
 
-        return requestRepository.findAllByRequester_IdNotOrderByCreatedDesc(
+        return requestRepository.findAllByRequesterId_NotOrderByCreatedDesc(
                 requesterId, pageable);
     }
 
     public Request findById(int requestId, int userId) {
-        Request request = requestRepository.findById(requestId)
+        getUserByIdOrElseThrow(userId);
+
+        return requestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Запрос не найден."));
-
-
-        if (request.getRequester().getId() == userId) {
-            return request;
-        }
-
-        throw new NotFoundException("Запрос не найден.");
     }
 
     private User getUserByIdOrElseThrow(int userId) {

@@ -42,15 +42,16 @@ public class RequestController {
     }
 
     @GetMapping("/{requestId}")
-    public ResponseEntity<Object> findById(@PathVariable int requestId) {
-        return requestClient.findById(requestId);
+    public ResponseEntity<Object> findById(@PathVariable int requestId,
+                                           @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {
+        return requestClient.findById(requestId, userId);
     }
 
     @ExceptionHandler
     public ResponseEntity<Object> handleHttpRequest(HttpClientErrorException ex) {
         return new ResponseEntity<>(
                 ex.getResponseBodyAsString(),
-                ex.getResponseHeaders(),
+//                ex.getResponseHeaders(),
                 ex.getStatusCode());
     }
 }

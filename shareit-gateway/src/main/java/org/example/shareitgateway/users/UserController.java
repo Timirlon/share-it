@@ -47,7 +47,7 @@ public class UserController {
     public ResponseEntity<Object> handleHttpRequest(HttpClientErrorException ex) {
         return new ResponseEntity<>(
                 ex.getResponseBodyAsString(),
-                ex.getResponseHeaders(),
+//                ex.getResponseHeaders(),
                 ex.getStatusCode());
     }
 }

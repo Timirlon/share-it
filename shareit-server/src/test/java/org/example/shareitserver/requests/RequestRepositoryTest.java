@@ -42,7 +42,7 @@ public class RequestRepositoryTest {
 
         requestRepository.save(request);
 
-        List<Request> foundRequests = requestRepository.findAllByRequester_IdOrderByCreatedDesc(requester.getId());
+        List<Request> foundRequests = requestRepository.findAllByRequesterId_OrderByCreatedDesc(requester.getId());
 
 
         assertEquals(expectedSize, foundRequests.size());
@@ -75,7 +75,7 @@ public class RequestRepositoryTest {
         requestRepository.save(request);
 
         Page<Request> foundRequests =
-                requestRepository.findAllByRequester_IdNotOrderByCreatedDesc(
+                requestRepository.findAllByRequesterId_NotOrderByCreatedDesc(
                         wrongRequesterId, PageRequest.of(page, size));
 
 

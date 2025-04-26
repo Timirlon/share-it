@@ -33,16 +33,34 @@ public class ItemService {
     RequestRepository requestRepository;
 
 
-    public List<Item> findAll(int ownerId, int from, int size) {
+    public List<Item> findAllByOwnerId(int ownerId, int from, int size) {
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
 
-        return itemRepository.findAllByOwnerId_OrderById(ownerId, pageable);
+        return itemRepository.findAllByOwnerId_OrderById(ownerId, pageable)
+                .stream()
+                .peek(item -> bookingRepository.findLastBooking(item.getId(), BookingStatus.APPROVED, LocalDateTime.now())
+                        .ifPresent(item::setLastBooking))
+                .peek(item -> bookingRepository.findNextBooking(item.getId(), BookingStatus.APPROVED, LocalDateTime.now())
+                        .ifPresent(item::setNextBooking))
+                .toList();
     }
 
-    public Item findById(int id) {
-        return itemRepository.findById(id)
+    public Item findById(int itemId, int userId) {
+        Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Товар не найден."));
+
+        if (item.getOwner().getId() == userId) {
+            LocalDateTime now = LocalDateTime.now();
+
+            bookingRepository.findLastBooking(itemId, BookingStatus.APPROVED, now)
+                    .ifPresent(item::setLastBooking);
+
+            bookingRepository.findNextBooking(itemId, BookingStatus.APPROVED, now)
+                    .ifPresent(item::setNextBooking);
+        }
+
+        return item;
     }
 
     public Item create(Item item, int userId, int requestId) {

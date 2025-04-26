@@ -30,17 +30,19 @@ public class ItemController {
     CommentMapper commentMapper;
 
     @GetMapping
-    public List<ItemReadDto> findAll(@RequestHeader(USER_ID_REQUEST_HEADER) int userId,
-                                     @RequestParam(defaultValue = "0") @Min(value = 0) int from,
-                                     @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size) {
+    public List<ItemReadDto> findAllByOwnerId(@RequestHeader(USER_ID_REQUEST_HEADER) int userId,
+                                              @RequestParam(defaultValue = "0") @Min(value = 0) int from,
+                                              @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size) {
         return itemMapper.toDto(
-                itemService.findAll(userId, from, size));
+                itemService.findAllByOwnerId(userId, from, size));
     }
 
     @GetMapping("/{id}")
-    public ItemReadDto findById(@PathVariable int id) {
+    public ItemReadDto findById(@PathVariable(name = "id") int itemId,
+                                @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {
+
         return itemMapper.toDto(
-                itemService.findById(id));
+                itemService.findById(itemId, userId));
     }
 
     @PostMapping

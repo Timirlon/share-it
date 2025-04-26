@@ -8,7 +8,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
@@ -59,10 +58,13 @@ public class RequestClient {
                 Map.of("from", from, "size", size));
     }
 
-    @GetMapping("/{requestId}")
-    public ResponseEntity<Object> findById(int requestId) {
-        return restTemplate.getForEntity(
+    public ResponseEntity<Object> findById(int requestId, int userId) {
+        HttpHeaders header = getUserIdRequestHeader(userId);
+
+        return restTemplate.exchange(
                 "requests/{requestId}",
+                HttpMethod.GET,
+                new HttpEntity<>(null, header),
                 Object.class,
                 Map.of("requestId", requestId));
     }

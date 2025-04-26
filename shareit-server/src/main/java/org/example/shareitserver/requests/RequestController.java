@@ -50,7 +50,7 @@ public class RequestController {
             @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size) {
 
         return mapper.toDto(
-                requestService.findAllByRequesterIdExcludingOrderByCreation(userId, from, size));
+                requestService.findAllByRequesterIdNot_OrderByCreated(userId, from, size));
     }
 
     @GetMapping("/{requestId}")

@@ -145,7 +145,7 @@ public class RequestControllerTest {
         secondRequest.setCreated(LocalDateTime.now());
 
 
-        Mockito.when(requestService.findAllByRequesterIdExcludingOrderByCreation(
+        Mockito.when(requestService.findAllByRequesterIdNot_OrderByCreated(
                 Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(new PageImpl<>(
                         List.of(firstRequest, secondRequest)));

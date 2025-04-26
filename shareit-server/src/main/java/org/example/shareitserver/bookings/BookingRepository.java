@@ -2,9 +2,11 @@ package org.example.shareitserver.bookings;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     // Получение списка всех бронирований текущего пользователя
@@ -41,6 +43,24 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findAllByItem_Owner_IdAndStatusOrderByStartDateDesc(int ownerId, BookingStatus status, Pageable pageable);
 
 
-
     List<Booking> findAllByBooker_IdAndItem_IdAndStatusAndStartDateBeforeOrderByStartDateAsc(int bookerId, int itemId, BookingStatus status, LocalDateTime start);
+
+
+    @Query("""
+            SELECT b FROM Booking b
+            WHERE b.item.id = :itemId
+            AND b.status = :status
+            AND b.startDate < :time
+            ORDER BY b.endDate DESC
+            LIMIT 1""")
+    Optional<Booking> findLastBooking(int itemId, BookingStatus status, LocalDateTime time);
+
+    @Query("""
+            SELECT b FROM Booking b
+            WHERE b.item.id = :itemId
+            AND b.status = :status
+            AND b.startDate > :time
+            ORDER BY b.startDate
+            LIMIT 1""")
+    Optional<Booking> findNextBooking(int itemId, BookingStatus status, LocalDateTime time);
 }

@@ -51,7 +51,7 @@ public class ItemServiceTest {
 
     @Test
     @SneakyThrows
-    void findAllTest() {
+    void findAllByOwnerIdTest() {
         int expectedSize = 2;
         int from = 0;
         int size = 5;
@@ -90,7 +90,7 @@ public class ItemServiceTest {
                 .thenReturn(List.of(firstItem, secondItem));
 
 
-        List<Item> foundItems = itemService.findAll(ownerId, from, size);
+        List<Item> foundItems = itemService.findAllByOwnerId(ownerId, from, size);
 
 
         assertEquals(expectedSize, foundItems.size());

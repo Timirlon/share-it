@@ -39,11 +39,15 @@ public class ItemClient {
                 Map.of("from", from, "size", size));
     }
 
-    public ResponseEntity<Object> findById(int id) {
-        return restTemplate.getForEntity(
+    public ResponseEntity<Object> findById(int itemId, int userId) {
+        HttpHeaders header = getUserIdRequestHeader(userId);
+
+        return restTemplate.exchange(
                 "/items/{id}",
+                HttpMethod.GET,
+                new HttpEntity<>(null, header),
                 Object.class,
-                Map.of("id", id));
+                Map.of("id", itemId));
     }
 
     public ResponseEntity<Object> create(ItemCreateDto itemDto, int userId) {

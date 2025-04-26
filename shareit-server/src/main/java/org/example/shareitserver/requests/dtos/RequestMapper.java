@@ -22,7 +22,6 @@ public class RequestMapper {
         dto.setDescription(request.getDescription());
         dto.setCreated(request.getCreated());
 
-
         if (!request.getResponseItems().isEmpty()) {
             List<ItemReadDto> itemDtos = itemMapper.toDto(request.getResponseItems());
             dto.setItems(itemDtos);

@@ -41,7 +41,7 @@ public class ItemControllerTest {
 
     @Test
     @SneakyThrows
-    void findAllTest() {
+    void findAllByOwnerIdTest() {
         int expectedSize = 2;
         int from = 0;
         int size = 5;
@@ -75,7 +75,7 @@ public class ItemControllerTest {
         secondItem.setOwner(owner);
 
 
-        Mockito.when(itemService.findAll(ownerId, from, size))
+        Mockito.when(itemService.findAllByOwnerId(ownerId, from, size))
                 .thenReturn(List.of(firstItem, secondItem));
 
 
@@ -272,7 +272,7 @@ public class ItemControllerTest {
 
     @Test
     @SneakyThrows
-    void findAllByTextTest() {
+    void findAllByOwnerIdByTextTest() {
         int expectedSize = 2;
         String text = "get";
         int from = 0;

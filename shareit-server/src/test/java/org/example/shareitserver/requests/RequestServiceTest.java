@@ -112,7 +112,7 @@ public class RequestServiceTest {
                 .thenReturn(Optional.of(requester));
 
 
-        Mockito.when(requestRepository.findAllByRequester_IdOrderByCreatedDesc(requesterId))
+        Mockito.when(requestRepository.findAllByRequesterId_OrderByCreatedDesc(requesterId))
                 .thenReturn(List.of(firstRequest, secondRequest));
 
 
@@ -171,13 +171,13 @@ public class RequestServiceTest {
         Mockito.when(userRepository.findById(requesterId))
                 .thenReturn(Optional.of(requester));
 
-        Mockito.when(requestRepository.findAllByRequester_IdNotOrderByCreatedDesc(
+        Mockito.when(requestRepository.findAllByRequesterId_NotOrderByCreatedDesc(
                 Mockito.anyInt(), Mockito.any(Pageable.class)))
                 .thenReturn(new PageImpl<>(
                         List.of(firstRequest, secondRequest)));
 
 
-        Page<Request> requestPage = requestService.findAllByRequesterIdExcludingOrderByCreation(
+        Page<Request> requestPage = requestService.findAllByRequesterIdNot_OrderByCreated(
                 requesterId, 0, 2);
 
         assertEquals(expectedSize, requestPage.getTotalElements());
@@ -194,7 +194,7 @@ public class RequestServiceTest {
 
 
         NotFoundException ex = assertThrows(NotFoundException.class,
-                () -> requestService.findAllByRequesterIdExcludingOrderByCreation(
+                () -> requestService.findAllByRequesterIdNot_OrderByCreated(
                         requesterId, 0, 2));
 
         assertEquals(expectedMessage, ex.getMessage());

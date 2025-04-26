@@ -40,4 +40,10 @@ public class Item {
 
     @OneToMany(mappedBy = "item")
     List<Comment> comments = new ArrayList<>();
+
+    @Transient
+    Booking lastBooking;
+
+    @Transient
+    Booking nextBooking;
 }

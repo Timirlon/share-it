@@ -27,8 +27,9 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> findById(@PathVariable int id) {
-        return itemClient.findById(id);
+    public ResponseEntity<Object> findById(@PathVariable(name = "id") int itemId,
+                                           @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {
+        return itemClient.findById(itemId, userId);
     }
 
     @PostMapping
@@ -69,7 +70,6 @@ public class ItemController {
     public ResponseEntity<Object> handleHttpRequest(HttpClientErrorException ex) {
         return new ResponseEntity<>(
                 ex.getResponseBodyAsString(),
-                ex.getResponseHeaders(),
                 ex.getStatusCode());
     }
 }

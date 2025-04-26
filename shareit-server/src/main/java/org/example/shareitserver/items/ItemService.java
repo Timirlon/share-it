@@ -32,6 +32,7 @@ public class ItemService {
     CommentRepository commentRepository;
     RequestRepository requestRepository;
 
+    //TODO: check users by id
 
     public List<Item> findAllByOwnerId(int ownerId, int from, int size) {
         int page = from / size;

@@ -26,20 +26,19 @@ public class BookingService {
     ItemRepository itemRepository;
 
     public Booking create(Booking booking, int userId, int bookedItemId) {
-        if (booking.getEndDate().isBefore(booking.getStartDate())
-        || booking.getEndDate().isEqual(booking.getStartDate())) {
-            throw new ValidationException("Некорректная дата или время окончания брони.");
-        }
-
-
-        booking.setStatus(BookingStatus.WAITING);
-
         User booker = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
         booking.setBooker(booker);
 
         Item bookedItem = itemRepository.findById(bookedItemId)
                 .orElseThrow(() -> new NotFoundException("Товар не найден."));
+
+        if (booking.getEndDate().isBefore(booking.getStartDate())
+        || booking.getEndDate().isEqual(booking.getStartDate())) {
+            throw new ValidationException("Некорректная дата или время окончания брони.");
+        }
+
+        booking.setStatus(BookingStatus.WAITING);
 
 
         if (userId == bookedItem.getOwner().getId()) {

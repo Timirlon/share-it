@@ -25,7 +25,7 @@ services:
 
 
   postgres-service:
-    image: postgres-15-alpine
+    image: postgres:15-alpine
     environment:
       - POSTGRES_DB=share_it
       - POSTGRES_USER=postgres

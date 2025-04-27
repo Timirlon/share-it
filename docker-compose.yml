@@ -8,6 +8,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SERVER_HOST=server-service
+      - TZ=Asia/Almaty
 
 
   server-service:
@@ -22,6 +23,7 @@ services:
       - DB_NAME=share_it
       - DB_USER=postgres
       - DB_PASSWORD=1234
+      - TZ=Asia/Almaty
 
 
   postgres-service:

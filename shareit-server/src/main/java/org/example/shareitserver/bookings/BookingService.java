@@ -41,7 +41,7 @@ public class BookingService {
 
 
         if (userId == bookedItem.getOwner().getId()) {
-            throw new NotFoundException("Товар не найден");
+            throw new NotFoundException("Товар не найден.");
         }
 
         if (!bookedItem.getAvailable()) {

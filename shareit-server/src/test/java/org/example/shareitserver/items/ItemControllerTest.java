@@ -2,6 +2,7 @@ package org.example.shareitserver.items;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.example.shareitserver.bookings.Booking;
 import org.example.shareitserver.items.comments.Comment;
 import org.example.shareitserver.items.comments.dtos.CommentCreateDto;
 import org.example.shareitserver.items.comments.dtos.CommentMapper;
@@ -105,6 +106,16 @@ public class ItemControllerTest {
 
         int userId = 1;
 
+        Booking lastBooking = new Booking();
+        int lastBookingId = 1;
+        lastBooking.setId(lastBookingId);
+        lastBooking.setBooker(new User());
+
+        Booking nextBooking = new Booking();
+        int nextBookingId = 2;
+        nextBooking.setId(nextBookingId);
+        nextBooking.setBooker(new User());
+
         int itemId = 1;
         String itemName = "get-test-item-name-1";
         String itemDesc = "get-test-item-desc-1";
@@ -116,6 +127,8 @@ public class ItemControllerTest {
         item.setDescription(itemDesc);
         item.setAvailable(isAvailable);
         item.setOwner(owner);
+        item.setLastBooking(lastBooking);
+        item.setNextBooking(nextBooking);
 
 
         Mockito.when(itemService.findById(itemId, userId))
@@ -129,7 +142,9 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name").value(itemName))
                 .andExpect(jsonPath("$.description").value(itemDesc))
                 .andExpect(jsonPath("$.available").value(isAvailable))
-                .andExpect(jsonPath("$.owner.name").value(ownerName));
+                .andExpect(jsonPath("$.owner.name").value(ownerName))
+                .andExpect(jsonPath("$.lastBooking.id").value(lastBookingId))
+                .andExpect(jsonPath("$.nextBooking.id").value(nextBookingId));
     }
 
     @Test

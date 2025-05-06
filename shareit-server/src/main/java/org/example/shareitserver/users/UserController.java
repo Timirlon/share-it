@@ -1,6 +1,5 @@
 package org.example.shareitserver.users;
 
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -36,7 +35,7 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserReadDto create(@Valid @RequestBody UserCreateDto userDto) {
+    public UserReadDto create(@RequestBody UserCreateDto userDto) {
         User user = mapper.fromDto(userDto);
 
         return mapper.toDto(
@@ -46,7 +45,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public UserReadDto update(
             @PathVariable int id,
-            @Valid @RequestBody UserUpdDto userDto) {
+            @RequestBody UserUpdDto userDto) {
         User user = mapper.fromDto(userDto);
 
         return mapper.toDto(

@@ -88,6 +88,8 @@
                         <exclude>**/ErrorResponse.class</exclude>
                         <exclude>**/ForbiddenAccessException.class</exclude>
                         <exclude>**/NotFoundException.class</exclude>
+                        <exclude>**/ValidationException.class</exclude>
+                        <exclude>**/UnsupportedStateException.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>

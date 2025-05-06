@@ -2,6 +2,7 @@ package org.example.shareitserver.items;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.example.shareitserver.bookings.Booking;
 import org.example.shareitserver.items.comments.Comment;
 import org.example.shareitserver.items.comments.dtos.CommentCreateDto;
 import org.example.shareitserver.items.comments.dtos.CommentMapper;
@@ -43,7 +44,7 @@ public class ItemControllerTest {
     @Test
     @SneakyThrows
     void findAllByOwnerIdTest() {
-        int expectedSize = 2;
+        int expectedCollectionSize = 2;
         int from = 0;
         int size = 5;
 
@@ -83,7 +84,7 @@ public class ItemControllerTest {
         mockMvc.perform(get(BASE_URL + "?from=" + from + "&size=" + size)
                     .header(USER_ID_REQUEST_HEADER, ownerId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(expectedSize))
+                .andExpect(jsonPath("$.length()").value(expectedCollectionSize))
                 .andExpect(jsonPath("$.[0].id").value(firstItemId))
                 .andExpect(jsonPath("$.[0].name").value(firstItemName))
                 .andExpect(jsonPath("$.[0].description").value(firstItemDesc))
@@ -105,6 +106,16 @@ public class ItemControllerTest {
 
         int userId = 1;
 
+        Booking lastBooking = new Booking();
+        int lastBookingId = 1;
+        lastBooking.setId(lastBookingId);
+        lastBooking.setBooker(new User());
+
+        Booking nextBooking = new Booking();
+        int nextBookingId = 2;
+        nextBooking.setId(nextBookingId);
+        nextBooking.setBooker(new User());
+
         int itemId = 1;
         String itemName = "get-test-item-name-1";
         String itemDesc = "get-test-item-desc-1";
@@ -116,6 +127,8 @@ public class ItemControllerTest {
         item.setDescription(itemDesc);
         item.setAvailable(isAvailable);
         item.setOwner(owner);
+        item.setLastBooking(lastBooking);
+        item.setNextBooking(nextBooking);
 
 
         Mockito.when(itemService.findById(itemId, userId))
@@ -129,7 +142,9 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name").value(itemName))
                 .andExpect(jsonPath("$.description").value(itemDesc))
                 .andExpect(jsonPath("$.available").value(isAvailable))
-                .andExpect(jsonPath("$.owner.name").value(ownerName));
+                .andExpect(jsonPath("$.owner.name").value(ownerName))
+                .andExpect(jsonPath("$.lastBooking.id").value(lastBookingId))
+                .andExpect(jsonPath("$.nextBooking.id").value(nextBookingId));
     }
 
     @Test
@@ -310,14 +325,15 @@ public class ItemControllerTest {
         secondItem.setOwner(owner);
 
 
-        Mockito.when(itemService.findByText(text, from, size))
+        Mockito.when(itemService.findByText(text, from, size, ownerId))
                 .thenReturn(new PageImpl<>(
                         List.of(firstItem, secondItem)));
 
 
         mockMvc.perform(get("/items/search?text=" + text
                 + "&from=" + from
-                + "&size=" + size))
+                + "&size=" + size)
+                        .header(USER_ID_REQUEST_HEADER, ownerId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(expectedSize))
                 .andExpect(jsonPath("$.[0].id").value(firstItemId))

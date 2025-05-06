@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -88,6 +89,85 @@ public class BookingServiceTest {
 
     @Test
     @SneakyThrows
+    void createTestEndDateIsBeforeStartDate() {
+        String expectedMessage = "Некорректная дата или время окончания брони.";
+
+        Booking booking = new Booking();
+        booking.setStartDate(LocalDateTime.now());
+        booking.setEndDate(LocalDateTime.now().minusHours(10));
+
+        User booker = new User();
+        int bookerId = 1;
+        booker.setId(bookerId);
+
+        User owner = new User();
+        int ownerId = 2;
+        owner.setId(ownerId);
+
+        Item bookedItem = new Item();
+        int bookedItemId = 1;
+        bookedItem.setId(bookedItemId);
+        bookedItem.setAvailable(true);
+        bookedItem.setOwner(owner);
+
+
+        Mockito.when(userRepository.findById(bookerId))
+                .thenReturn(Optional.of(booker));
+
+        Mockito.when(itemRepository.findById(bookedItemId))
+                .thenReturn(Optional.of(bookedItem));
+
+
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> bookingService.create(booking, bookerId, bookedItemId)
+        );
+
+        assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
+    void createTestEndDateIsEqualToStartDate() {
+        String expectedMessage = "Некорректная дата или время окончания брони.";
+
+        LocalDateTime now = LocalDateTime.now();
+        Booking booking = new Booking();
+        booking.setStartDate(now);
+        booking.setEndDate(now);
+
+        User booker = new User();
+        int bookerId = 1;
+        booker.setId(bookerId);
+
+        User owner = new User();
+        int ownerId = 2;
+        owner.setId(ownerId);
+
+        Item bookedItem = new Item();
+        int bookedItemId = 1;
+        bookedItem.setId(bookedItemId);
+        bookedItem.setAvailable(true);
+        bookedItem.setOwner(owner);
+
+
+        Mockito.when(userRepository.findById(bookerId))
+                .thenReturn(Optional.of(booker));
+
+        Mockito.when(itemRepository.findById(bookedItemId))
+                .thenReturn(Optional.of(bookedItem));
+
+
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> bookingService.create(booking, bookerId, bookedItemId)
+        );
+
+        assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
     void createTestItemNotAvailable() {
         String expectedMessage = "Товар недоступен.";
 
@@ -120,6 +200,40 @@ public class BookingServiceTest {
         ValidationException e = assertThrows(
                 ValidationException.class,
                 () -> bookingService.create(booking, bookerId, bookedItemId)
+        );
+
+        assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
+    void createTestBookedByOwner() {
+        String expectedMessage = "Товар не найден.";
+
+        Booking booking = new Booking();
+        booking.setStartDate(LocalDateTime.now());
+        booking.setEndDate(LocalDateTime.now().plusHours(10));
+
+        User owner = new User();
+        int ownerId = 2;
+        owner.setId(ownerId);
+
+        Item bookedItem = new Item();
+        int bookedItemId = 1;
+        bookedItem.setId(bookedItemId);
+        bookedItem.setAvailable(true);
+        bookedItem.setOwner(owner);
+
+        Mockito.when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
+
+        Mockito.when(itemRepository.findById(bookedItemId))
+                .thenReturn(Optional.of(bookedItem));
+
+
+        NotFoundException e = assertThrows(
+                NotFoundException.class,
+                () -> bookingService.create(booking, ownerId, bookedItemId)
         );
 
         assertEquals(expectedMessage, e.getMessage());
@@ -172,8 +286,15 @@ public class BookingServiceTest {
         String expectedMessage = "Запись не найдена.";
 
         int bookingId = 1;
-        int userId = 1;
         boolean isApproved = true;
+
+        User user = new User();
+        int userId = 1;
+        user.setId(userId);
+
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
 
         Mockito.when(bookingRepository.findById(bookingId))
                 .thenReturn(Optional.empty());
@@ -205,9 +326,15 @@ public class BookingServiceTest {
         booking.setEndDate(LocalDateTime.now().plusHours(10));
         booking.setItem(bookedItem);
 
-
-        int wrongUserId = 999;
         boolean isApproved = true;
+
+        User wrongUser = new User();
+        int wrongUserId = 999;
+        wrongUser.setId(wrongUserId);
+
+
+        Mockito.when(userRepository.findById(wrongUserId))
+                .thenReturn(Optional.of(wrongUser));
 
         Mockito.when(bookingRepository.findById(bookingId))
                 .thenReturn(Optional.of(booking));
@@ -217,6 +344,99 @@ public class BookingServiceTest {
                 NotFoundException.class,
                 () -> bookingService.updateStatus(bookingId, wrongUserId, isApproved)
         );
+
+
+        assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
+    void updateStatusTestApproveAlreadyApprovedBooking() {
+        String expectedMessage = "Статусу записи уже задано данное значение.";
+
+        User owner = new User();
+        int ownerId = 1;
+        owner.setId(ownerId);
+
+        User booker = new User();
+        int bookerId = 2;
+        booker.setId(bookerId);
+
+        Item bookedItem = new Item();
+        int bookedItemId = 5;
+        bookedItem.setId(bookedItemId);
+        bookedItem.setOwner(owner);
+
+        Booking booking = new Booking();
+        int bookingId = 1;
+        booking.setId(bookingId);
+        booking.setStartDate(LocalDateTime.now());
+        booking.setEndDate(LocalDateTime.now().plusHours(10));
+        booking.setItem(bookedItem);
+        booking.setBooker(booker);
+        booking.setStatus(BookingStatus.APPROVED);
+
+        boolean isApproved = true;
+
+
+        Mockito.when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
+
+        Mockito.when(bookingRepository.findById(bookingId))
+                .thenReturn(Optional.of(booking));
+
+
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> bookingService.updateStatus(bookingId, ownerId, isApproved)
+        );
+
+
+        assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
+    void updateStatusTestRejectAlreadyRejectedBooking() {
+        String expectedMessage = "Статусу записи уже задано данное значение.";
+
+        User owner = new User();
+        int ownerId = 1;
+        owner.setId(ownerId);
+
+        User booker = new User();
+        int bookerId = 2;
+        booker.setId(bookerId);
+
+        Item bookedItem = new Item();
+        int bookedItemId = 5;
+        bookedItem.setId(bookedItemId);
+        bookedItem.setOwner(owner);
+
+        Booking booking = new Booking();
+        int bookingId = 1;
+        booking.setId(bookingId);
+        booking.setStartDate(LocalDateTime.now());
+        booking.setEndDate(LocalDateTime.now().plusHours(10));
+        booking.setItem(bookedItem);
+        booking.setBooker(booker);
+        booking.setStatus(BookingStatus.REJECTED);
+
+        boolean isApproved = false;
+
+
+        Mockito.when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
+
+        Mockito.when(bookingRepository.findById(bookingId))
+                .thenReturn(Optional.of(booking));
+
+
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> bookingService.updateStatus(bookingId, ownerId, isApproved)
+        );
+
 
         assertEquals(expectedMessage, e.getMessage());
     }
@@ -247,6 +467,9 @@ public class BookingServiceTest {
 
         boolean isApproved = true;
 
+
+        Mockito.when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
         Mockito.when(bookingRepository.findById(bookingId))
                 .thenReturn(Optional.of(booking));
@@ -292,6 +515,9 @@ public class BookingServiceTest {
         boolean isApproved = false;
 
 
+        Mockito.when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
+
         Mockito.when(bookingRepository.findById(bookingId))
                 .thenReturn(Optional.of(booking));
 
@@ -315,7 +541,14 @@ public class BookingServiceTest {
         String expectedMessage = "Запись не найдена.";
 
         int bookingId = 1;
+
+        User user = new User();
         int userId = 1;
+        user.setId(userId);
+
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
 
         Mockito.when(bookingRepository.findById(bookingId))
                 .thenReturn(Optional.empty());
@@ -335,6 +568,8 @@ public class BookingServiceTest {
         String expectedMessage = "Запись не найдена.";
 
         int wrongUserId = 999;
+        User wrongUser = new User();
+        wrongUser.setId(wrongUserId);
 
         User booker = new User();
         int bookerId = 1;
@@ -353,6 +588,8 @@ public class BookingServiceTest {
         booking.setBooker(booker);
         booking.setItem(bookedItem);
 
+        Mockito.when(userRepository.findById(wrongUserId))
+                .thenReturn(Optional.of(wrongUser));
 
         Mockito.when(bookingRepository.findById(bookingId))
                 .thenReturn(Optional.of(booking));
@@ -390,6 +627,9 @@ public class BookingServiceTest {
         booking.setItem(bookedItem);
 
 
+        Mockito.when(userRepository.findById(bookerId))
+                .thenReturn(Optional.of(booker));
+
         Mockito.when(bookingRepository.findById(bookingId))
                 .thenReturn(Optional.of(booking));
 
@@ -425,6 +665,9 @@ public class BookingServiceTest {
         booking.setBooker(booker);
         booking.setItem(bookedItem);
 
+
+        Mockito.when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
         Mockito.when(bookingRepository.findById(bookingId))
                 .thenReturn(Optional.of(booking));
@@ -496,11 +739,13 @@ public class BookingServiceTest {
 
         Mockito.when(bookingRepository.findAllByBooker_IdOrderByStartDateDesc(
                 bookerId, PageRequest.of(page, size)))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByBookerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -548,11 +793,13 @@ public class BookingServiceTest {
         Mockito.when(bookingRepository.findAllByBooker_IdAndStartDateIsBeforeAndEndDateIsAfterOrderByStartDateDesc(
                         Mockito.anyInt(), Mockito.any(LocalDateTime.class),
                         Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class)))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByBookerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -600,11 +847,13 @@ public class BookingServiceTest {
         Mockito.when(bookingRepository.findAllByBooker_IdAndEndDateIsBeforeOrderByStartDateDesc(
                         Mockito.anyInt(), Mockito.any(LocalDateTime.class),
                         Mockito.any(Pageable.class)))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByBookerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -652,11 +901,13 @@ public class BookingServiceTest {
         Mockito.when(bookingRepository.findAllByBooker_IdAndStartDateIsAfterOrderByStartDateDesc(
                         Mockito.anyInt(), Mockito.any(LocalDateTime.class),
                         Mockito.any(Pageable.class)))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByBookerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -705,11 +956,13 @@ public class BookingServiceTest {
         Mockito.when(bookingRepository.findAllByBooker_IdAndStatusOrderByStartDateDesc(
                 bookerId, status, PageRequest.of(page, size)
                 ))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByBookerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -758,11 +1011,13 @@ public class BookingServiceTest {
         Mockito.when(bookingRepository.findAllByBooker_IdAndStatusOrderByStartDateDesc(
                         bookerId, status, PageRequest.of(page, size)
                 ))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByBookerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -832,11 +1087,13 @@ public class BookingServiceTest {
 
         Mockito.when(bookingRepository.findAllByItem_Owner_IdOrderByStartDateDesc(
                         bookerId, PageRequest.of(page, size)))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByItemOwnerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -884,11 +1141,13 @@ public class BookingServiceTest {
         Mockito.when(bookingRepository.findAllByItem_Owner_IdAndStartDateIsBeforeAndEndDateIsAfterOrderByStartDateDesc(
                         Mockito.anyInt(), Mockito.any(LocalDateTime.class),
                         Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class)))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByItemOwnerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -936,11 +1195,13 @@ public class BookingServiceTest {
         Mockito.when(bookingRepository.findAllByItem_Owner_IdAndEndDateIsBeforeOrderByStartDateDesc(
                         Mockito.anyInt(), Mockito.any(LocalDateTime.class),
                         Mockito.any(Pageable.class)))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByItemOwnerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -988,11 +1249,13 @@ public class BookingServiceTest {
         Mockito.when(bookingRepository.findAllByItem_Owner_IdAndStartDateIsAfterOrderByStartDateDesc(
                         Mockito.anyInt(), Mockito.any(LocalDateTime.class),
                         Mockito.any(Pageable.class)))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByItemOwnerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -1041,11 +1304,13 @@ public class BookingServiceTest {
         Mockito.when(bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDateDesc(
                         bookerId, status, PageRequest.of(page, size)
                 ))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByItemOwnerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -1094,11 +1359,13 @@ public class BookingServiceTest {
         Mockito.when(bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDateDesc(
                         bookerId, status, PageRequest.of(page, size)
                 ))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         List<Booking> found = bookingService.findAllByItemOwnerId(
-                bookerId, state, page, size);
+                bookerId, state, page, size)
+                .toList();
 
 
         assertEquals(expectedSize, found.size());

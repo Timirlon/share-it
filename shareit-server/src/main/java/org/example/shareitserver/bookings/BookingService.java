@@ -9,12 +9,12 @@ import org.example.shareitserver.items.Item;
 import org.example.shareitserver.items.ItemRepository;
 import org.example.shareitserver.users.User;
 import org.example.shareitserver.users.UserRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -26,12 +26,11 @@ public class BookingService {
     ItemRepository itemRepository;
 
     public Booking create(Booking booking, int userId, int bookedItemId) {
-        User booker = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
+        User booker = findUserByIdOrElseThrowNotFound(userId);
         booking.setBooker(booker);
 
-        Item bookedItem = itemRepository.findById(bookedItemId)
-                .orElseThrow(() -> new NotFoundException("Товар не найден."));
+        Item bookedItem = findItemByIdOrElseThrowNotFound(bookedItemId);
+
 
         if (booking.getEndDate().isBefore(booking.getStartDate())
         || booking.getEndDate().isEqual(booking.getStartDate())) {
@@ -42,7 +41,7 @@ public class BookingService {
 
 
         if (userId == bookedItem.getOwner().getId()) {
-            throw new NotFoundException("Товар не найден");
+            throw new NotFoundException("Товар не найден.");
         }
 
         if (!bookedItem.getAvailable()) {
@@ -56,8 +55,9 @@ public class BookingService {
     }
 
     public Booking updateStatus(int bookingId, int userId, boolean isApproved) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Запись не найдена."));
+        findUserByIdOrElseThrowNotFound(userId);
+
+        Booking booking = findBookingByIdOrElseThrowNotFound(bookingId);
 
 
         if (userId != booking.getItem().getOwner().getId()) {
@@ -81,8 +81,9 @@ public class BookingService {
     }
 
     public Booking findById(int bookingId, int userId) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Запись не найдена."));
+        findUserByIdOrElseThrowNotFound(userId);
+
+        Booking booking = findBookingByIdOrElseThrowNotFound(bookingId);
 
         if (userId != booking.getBooker().getId()
                 && userId != booking.getItem().getOwner().getId()) {
@@ -94,9 +95,8 @@ public class BookingService {
         return booking;
     }
 
-    public List<Booking> findAllByBookerId(int bookerId, BookingFilteringState state, int from, int size) {
-        userRepository.findById(bookerId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
+    public Page<Booking> findAllByBookerId(int bookerId, BookingFilteringState state, int from, int size) {
+        findUserByIdOrElseThrowNotFound(bookerId);
 
 
         int page = from / size;
@@ -121,9 +121,8 @@ public class BookingService {
         };
     }
 
-    public List<Booking> findAllByItemOwnerId(int ownerId, BookingFilteringState state, int from, int size) {
-        userRepository.findById(ownerId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
+    public Page<Booking> findAllByItemOwnerId(int ownerId, BookingFilteringState state, int from, int size) {
+        findUserByIdOrElseThrowNotFound(ownerId);
 
 
         int page = from / size;
@@ -148,4 +147,18 @@ public class BookingService {
         };
     }
 
+    private User findUserByIdOrElseThrowNotFound(int userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
+    }
+
+    private Booking findBookingByIdOrElseThrowNotFound(int bookingId) {
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Запись не найдена."));
+    }
+
+    private Item findItemByIdOrElseThrowNotFound(int itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Товар не найден."));
+    }
 }

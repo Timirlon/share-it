@@ -85,6 +85,9 @@ public class ItemServiceTest {
         secondItem.setOwner(owner);
 
 
+        Mockito.when(userRepository.findById(ownerId))
+                        .thenReturn(Optional.of(owner));
+
         Mockito.when(itemRepository.findAllByOwnerId_OrderById(
                         Mockito.anyInt(), Mockito.any(Pageable.class)))
                 .thenReturn(List.of(firstItem, secondItem));
@@ -110,7 +113,7 @@ public class ItemServiceTest {
 
     @Test
     @SneakyThrows
-    void findByIdTestSuccess() {
+    void findByIdTestUserIdAndItemOwnerIdMatch() {
         int ownerId = 1;
         User owner = new User();
         owner.setId(ownerId);
@@ -127,12 +130,29 @@ public class ItemServiceTest {
         item.setOwner(owner);
 
 
+        Booking lastBooking = new Booking();
+        int lastBookingId = 1;
+        lastBooking.setId(lastBookingId);
+
+        Booking nextBooking = new Booking();
+        int nextBookingId = 2;
+        nextBooking.setId(nextBookingId);
+
+
+        Mockito.when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
+
         Mockito.when(itemRepository.findById(itemId))
                 .thenReturn(Optional.of(item));
 
+        Mockito.when(bookingRepository.findLastBooking(
+                Mockito.anyInt(), Mockito.any(), Mockito.any()))
+                .thenReturn(Optional.of(lastBooking));
 
-//        Mockito.when(userRepository.findById(ownerId))
-//                .thenReturn(Optional.of(owner));
+        Mockito.when(bookingRepository.findNextBooking(
+                Mockito.anyInt(), Mockito.any(), Mockito.any()))
+                .thenReturn(Optional.of(nextBooking));
+
 
         Item foundItem = itemService.findById(itemId, ownerId);
 
@@ -141,6 +161,59 @@ public class ItemServiceTest {
         assertEquals(itemName, foundItem.getName());
         assertEquals(itemDesc, foundItem.getDescription());
         assertEquals(ownerId, foundItem.getOwner().getId());
+        assertEquals(lastBookingId, item.getLastBooking().getId());
+        assertEquals(nextBookingId, item.getNextBooking().getId());
+        assertTrue(item.getAvailable());
+    }
+
+    @Test
+    @SneakyThrows
+    void findByIdTestUserIdAndItemOwnerIdDoNotMatch() {
+        int ownerId = 1;
+        User owner = new User();
+        owner.setId(ownerId);
+
+        int userId = 2;
+        User user = new User();
+        user.setId(userId);
+
+        int itemId = 1;
+        String itemName = "get-test-item-name-1";
+        String itemDesc = "get-test-item-desc-1";
+        boolean isAvailable = true;
+        Item item = new Item();
+        item.setId(itemId);
+        item.setName(itemName);
+        item.setDescription(itemDesc);
+        item.setAvailable(isAvailable);
+        item.setOwner(owner);
+
+
+        Booking lastBooking = new Booking();
+        int lastBookingId = 1;
+        lastBooking.setId(lastBookingId);
+
+        Booking nextBooking = new Booking();
+        int nextBookingId = 2;
+        nextBooking.setId(nextBookingId);
+
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        Mockito.when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(item));
+
+
+        Item foundItem = itemService.findById(itemId, userId);
+
+
+        assertEquals(itemId, foundItem.getId());
+        assertEquals(itemName, foundItem.getName());
+        assertEquals(itemDesc, foundItem.getDescription());
+        assertEquals(ownerId, foundItem.getOwner().getId());
+        assertNull(item.getLastBooking());
+        assertNull(item.getNextBooking());
         assertTrue(item.getAvailable());
     }
 
@@ -151,10 +224,14 @@ public class ItemServiceTest {
         int wrongId = 999;
 
         int userId = 1;
+        User user = new User();
+        user.setId(userId);
 
         Mockito.when(itemRepository.findById(wrongId))
                 .thenReturn(Optional.empty());
 
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
 
         NotFoundException e = assertThrows(
                 NotFoundException.class,
@@ -334,6 +411,14 @@ public class ItemServiceTest {
         Item updateItem = new Item();
         updateItem.setName(updatedName);
 
+        User user = new User();
+        int userId = 1;
+        user.setId(userId);
+
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
         Mockito.when(itemRepository.findById(itemId))
                 .thenReturn(Optional.of(initialItem));
 
@@ -371,6 +456,14 @@ public class ItemServiceTest {
 
         Item updateItem = new Item();
         updateItem.setDescription(updatedDesc);
+
+        User user = new User();
+        int userId = 1;
+        user.setId(userId);
+
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
 
         Mockito.when(itemRepository.findById(itemId))
                 .thenReturn(Optional.of(initialItem));
@@ -410,6 +503,14 @@ public class ItemServiceTest {
         Item updateItem = new Item();
         updateItem.setAvailable(updatedAvailability);
 
+        User user = new User();
+        int userId = 1;
+        user.setId(userId);
+
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
         Mockito.when(itemRepository.findById(itemId))
                 .thenReturn(Optional.of(initialItem));
 
@@ -428,10 +529,16 @@ public class ItemServiceTest {
     void updateTestItemNotFoundFail() {
         String expectedMessage = "Товар не найден.";
         int wrongId = 999;
-        int ownerId = 0;
         Item item = new Item();
         item.setName("update-test-item-name-1");
 
+        User owner = new User();
+        int ownerId = 1;
+        owner.setId(ownerId);
+
+
+        Mockito.when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
         Mockito.when(itemRepository.findById(wrongId))
                 .thenReturn(Optional.empty());
@@ -449,7 +556,6 @@ public class ItemServiceTest {
     void updateTestUserIsNotOwnerFail() {
         String expectedMessage = "Товар не найден.";
 
-        int userId = 999;
 
         int ownerId = 1;
         String ownerName = "update-test-owner-name-1";
@@ -473,13 +579,21 @@ public class ItemServiceTest {
         Item updateItem = new Item();
         updateItem.setName(updatedName);
 
+        User wrongUser = new User();
+        int wrongUserId = 999;
+        wrongUser.setId(wrongUserId);
+
+
+        Mockito.when(userRepository.findById(wrongUserId))
+                .thenReturn(Optional.of(wrongUser));
+
         Mockito.when(itemRepository.findById(itemId))
                 .thenReturn(Optional.of(initialItem));
 
 
         NotFoundException e = assertThrows(
                 NotFoundException.class,
-                () -> itemService.update(itemId, initialItem, userId));
+                () -> itemService.update(itemId, initialItem, wrongUserId));
 
         assertEquals(expectedMessage, e.getMessage());
     }
@@ -504,12 +618,20 @@ public class ItemServiceTest {
         secondItem.setId(secondId);
         secondItem.setName(secondName);
 
+        User user = new User();
+        int userId = 1;
+        user.setId(userId);
+
+        Mockito.when(userRepository.findById(userId))
+                        .thenReturn(Optional.of(user));
+
         Mockito.when(itemRepository.findAllByText(
                 Mockito.anyString(), Mockito.any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(firstItem, secondItem)));
 
 
-        List<Item> foundItems = itemService.findByText(text, page, size).toList();
+        List<Item> foundItems = itemService.findByText(text, page, size, userId)
+                .toList();
 
 
         assertEquals(expectedSize, foundItems.size());
@@ -527,7 +649,15 @@ public class ItemServiceTest {
         int page = 0;
         int size = 5;
 
-        Page<Item> foundItems = itemService.findByText(text, page, size);
+        User user = new User();
+        int userId = 1;
+        user.setId(userId);
+
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        Page<Item> foundItems = itemService.findByText(text, page, size, userId);
 
         assertEquals(expectedSize, foundItems.getTotalElements());
     }
@@ -540,7 +670,15 @@ public class ItemServiceTest {
         int page = 0;
         int size = 5;
 
-        Page<Item> foundItems = itemService.findByText(text, page, size);
+        User user = new User();
+        int userId = 1;
+        user.setId(userId);
+
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        Page<Item> foundItems = itemService.findByText(text, page, size, userId);
 
         assertEquals(expectedSize, foundItems.getTotalElements());
     }

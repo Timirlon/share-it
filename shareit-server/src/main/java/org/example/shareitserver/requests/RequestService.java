@@ -23,7 +23,7 @@ public class RequestService {
 
 
     public Request create(Request request, int requesterId) {
-        User requester = getUserByIdOrElseThrow(requesterId);
+        User requester = findUserByIdOrElseThrowNotFound(requesterId);
         request.setRequester(requester);
 
         requestRepository.save(request);
@@ -32,13 +32,13 @@ public class RequestService {
     }
 
     public List<Request> findAllByRequesterId(int requesterId) {
-        getUserByIdOrElseThrow(requesterId);
+        findUserByIdOrElseThrowNotFound(requesterId);
 
         return requestRepository.findAllByRequesterId_OrderByCreatedDesc(requesterId);
     }
 
     public Page<Request> findAllByRequesterIdNot_OrderByCreated(int requesterId, int from, int size) {
-        getUserByIdOrElseThrow(requesterId);
+        findUserByIdOrElseThrowNotFound(requesterId);
 
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
@@ -48,13 +48,13 @@ public class RequestService {
     }
 
     public Request findById(int requestId, int userId) {
-        getUserByIdOrElseThrow(userId);
+        findUserByIdOrElseThrowNotFound(userId);
 
         return requestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Запрос не найден."));
     }
 
-    private User getUserByIdOrElseThrow(int userId) {
+    private User findUserByIdOrElseThrowNotFound(int userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
     }

@@ -50,11 +50,13 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> findByText(@RequestParam String text,
-                                        @RequestParam(defaultValue = "0") @Min(value = 0) int from,
-                                        @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size) {
+    public ResponseEntity<Object> findByText(
+            @RequestParam String text,
+            @RequestParam(defaultValue = "0") @Min(value = 0) int from,
+            @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size,
+            @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {
 
-        return itemClient.findByText(text, from, size);
+        return itemClient.findByText(text, from, size, userId);
     }
 
     @PostMapping("/{itemId}/comment")

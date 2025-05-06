@@ -138,94 +138,94 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.email").value(userEmail));
     }
 
-    @Test
-    @SneakyThrows
-    void createWithBlankNameTest() {
-        String userName = "   ";
-        String userEmail = "test-create@post.com";
-
-        UserCreateDto userDto = new UserCreateDto();
-        userDto.setName(userName);
-        userDto.setEmail(userEmail);
-
-        Mockito.when(userService.create(Mockito.any(User.class)))
-                .thenAnswer(
-                        invocationOnMock -> {
-                            User returnUser = invocationOnMock.getArgument(0, User.class);
-                            returnUser.setId(1);
-                            returnUser.setName(userName);
-                            returnUser.setEmail(userEmail);
-
-                            return returnUser;
-                        });
-
-
-        String userDtoInJson = objectMapper.writeValueAsString(userDto);
-
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userDtoInJson))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
-    void createWithEmailOfNullTest() {
-        String userName = "test-create";
-
-        UserCreateDto userDto = new UserCreateDto();
-        userDto.setName(userName);
-        userDto.setEmail(null);
-
-        Mockito.when(userService.create(Mockito.any(User.class)))
-                .thenAnswer(
-                        invocationOnMock -> {
-                            User returnUser = invocationOnMock.getArgument(0, User.class);
-                            returnUser.setId(1);
-                            returnUser.setName(userName);
-                            returnUser.setEmail(null);
-
-                            return returnUser;
-                        });
-
-
-        String userDtoInJson = objectMapper.writeValueAsString(userDto);
-
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userDtoInJson))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
-    void createWithInvalidEmailTest() {
-        String userName = "test-create";
-        String userEmail = "//test@create@invalid.email";
-
-        UserCreateDto userDto = new UserCreateDto();
-        userDto.setName(userName);
-        userDto.setEmail(userEmail);
-
-        Mockito.when(userService.create(Mockito.any(User.class)))
-                .thenAnswer(
-                        invocationOnMock -> {
-                            User returnUser = invocationOnMock.getArgument(0, User.class);
-                            returnUser.setId(1);
-                            returnUser.setName(userName);
-                            returnUser.setEmail(userEmail);
-
-                            return returnUser;
-                        });
-
-
-        String userDtoInJson = objectMapper.writeValueAsString(userDto);
-
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userDtoInJson))
-                .andExpect(status().isBadRequest());
-    }
+//    @Test
+//    @SneakyThrows
+//    void createWithBlankNameTest() {
+//        String userName = "   ";
+//        String userEmail = "test-create@post.com";
+//
+//        UserCreateDto userDto = new UserCreateDto();
+//        userDto.setName(userName);
+//        userDto.setEmail(userEmail);
+//
+//        Mockito.when(userService.create(Mockito.any(User.class)))
+//                .thenAnswer(
+//                        invocationOnMock -> {
+//                            User returnUser = invocationOnMock.getArgument(0, User.class);
+//                            returnUser.setId(1);
+//                            returnUser.setName(userName);
+//                            returnUser.setEmail(userEmail);
+//
+//                            return returnUser;
+//                        });
+//
+//
+//        String userDtoInJson = objectMapper.writeValueAsString(userDto);
+//
+//        mockMvc.perform(post("/users")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(userDtoInJson))
+//                .andExpect(status().isBadRequest());
+//    }
+//
+//    @Test
+//    @SneakyThrows
+//    void createWithEmailOfNullTest() {
+//        String userName = "test-create";
+//
+//        UserCreateDto userDto = new UserCreateDto();
+//        userDto.setName(userName);
+//        userDto.setEmail(null);
+//
+//        Mockito.when(userService.create(Mockito.any(User.class)))
+//                .thenAnswer(
+//                        invocationOnMock -> {
+//                            User returnUser = invocationOnMock.getArgument(0, User.class);
+//                            returnUser.setId(1);
+//                            returnUser.setName(userName);
+//                            returnUser.setEmail(null);
+//
+//                            return returnUser;
+//                        });
+//
+//
+//        String userDtoInJson = objectMapper.writeValueAsString(userDto);
+//
+//        mockMvc.perform(post("/users")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(userDtoInJson))
+//                .andExpect(status().isBadRequest());
+//    }
+//
+//    @Test
+//    @SneakyThrows
+//    void createWithInvalidEmailTest() {
+//        String userName = "test-create";
+//        String userEmail = "//test@create@invalid.email";
+//
+//        UserCreateDto userDto = new UserCreateDto();
+//        userDto.setName(userName);
+//        userDto.setEmail(userEmail);
+//
+//        Mockito.when(userService.create(Mockito.any(User.class)))
+//                .thenAnswer(
+//                        invocationOnMock -> {
+//                            User returnUser = invocationOnMock.getArgument(0, User.class);
+//                            returnUser.setId(1);
+//                            returnUser.setName(userName);
+//                            returnUser.setEmail(userEmail);
+//
+//                            return returnUser;
+//                        });
+//
+//
+//        String userDtoInJson = objectMapper.writeValueAsString(userDto);
+//
+//        mockMvc.perform(post("/users")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(userDtoInJson))
+//                .andExpect(status().isBadRequest());
+//    }
 
     @Test
     @SneakyThrows

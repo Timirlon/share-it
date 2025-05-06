@@ -6,9 +6,9 @@ import lombok.experimental.FieldDefaults;
 import org.example.shareitserver.bookings.Booking;
 import org.example.shareitserver.items.dtos.ItemMapper;
 import org.example.shareitserver.users.dtos.UserMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
 import java.util.List;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -42,7 +42,7 @@ public class BookingMapper {
         return booking;
     }
 
-    public List<BookingReadDto> toDto(Collection<Booking> bookings) {
+    public List<BookingReadDto> toDto(Page<Booking> bookings) {
         return bookings.stream()
                 .map(this::toDto)
                 .toList();

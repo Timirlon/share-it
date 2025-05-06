@@ -1,14 +1,11 @@
 package org.example.shareitserver.requests;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.shareitserver.requests.dtos.RequestCreateDto;
 import org.example.shareitserver.requests.dtos.RequestMapper;
 import org.example.shareitserver.requests.dtos.RequestReadDto;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +25,7 @@ public class RequestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RequestReadDto create(
-            @RequestBody @Valid RequestCreateDto requestDto,
+            @RequestBody RequestCreateDto requestDto,
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId) {
         Request request = mapper.fromDto(requestDto);
 
@@ -46,8 +43,8 @@ public class RequestController {
     @GetMapping("/all")
     public List<RequestReadDto> findAllOfOthers(
             @RequestHeader(USER_ID_REQUEST_HEADER) int userId,
-            @RequestParam(defaultValue = "0") @Min(value = 0) int from,
-            @RequestParam(defaultValue = "10") @Range(min = 1, max = 20) int size) {
+            @RequestParam(defaultValue = "0") int from,
+            @RequestParam(defaultValue = "10") int size) {
 
         return mapper.toDto(
                 requestService.findAllByRequesterIdNot_OrderByCreated(userId, from, size));

@@ -62,7 +62,8 @@ public class BookingRepositoryTest {
 
 
         List<Booking> found = bookingRepository.findAllByBooker_IdOrderByStartDateDesc(
-                booker.getId(), PageRequest.of(page, size));
+                booker.getId(), PageRequest.of(page, size))
+                .toList();
 
         assertEquals(expectedSize, found.size());
         assertEquals(booking.getId(), found.get(0).getId());
@@ -118,7 +119,8 @@ public class BookingRepositoryTest {
 
         List<Booking> found = bookingRepository.findAllByBooker_IdAndStartDateIsBeforeAndEndDateIsAfterOrderByStartDateDesc(
                 booker.getId(), LocalDateTime.now(),
-                LocalDateTime.now(), PageRequest.of(page, size));
+                LocalDateTime.now(), PageRequest.of(page, size))
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -174,7 +176,8 @@ public class BookingRepositoryTest {
 
 
         List<Booking> found = bookingRepository.findAllByBooker_IdAndEndDateIsBeforeOrderByStartDateDesc(
-                booker.getId(), LocalDateTime.now(), PageRequest.of(page, size));
+                booker.getId(), LocalDateTime.now(), PageRequest.of(page, size))
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -230,7 +233,8 @@ public class BookingRepositoryTest {
 
 
         List<Booking> found = bookingRepository.findAllByBooker_IdAndStartDateIsAfterOrderByStartDateDesc(
-                booker.getId(), LocalDateTime.now(), PageRequest.of(page, size));
+                booker.getId(), LocalDateTime.now(), PageRequest.of(page, size))
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -286,7 +290,8 @@ public class BookingRepositoryTest {
 
 
         List<Booking> found = bookingRepository.findAllByBooker_IdAndStatusOrderByStartDateDesc(
-                booker.getId(), BookingStatus.REJECTED, PageRequest.of(page, size));
+                booker.getId(), BookingStatus.REJECTED, PageRequest.of(page, size))
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -334,7 +339,8 @@ public class BookingRepositoryTest {
 
 
         List<Booking> found = bookingRepository.findAllByItem_Owner_IdOrderByStartDateDesc(
-                itemOwner.getId(), PageRequest.of(page, size));
+                itemOwner.getId(), PageRequest.of(page, size))
+                .toList();
 
         assertEquals(expectedSize, found.size());
         assertEquals(booking.getId(), found.get(0).getId());
@@ -397,7 +403,8 @@ public class BookingRepositoryTest {
 
         List<Booking> found = bookingRepository.findAllByItem_Owner_IdAndStartDateIsBeforeAndEndDateIsAfterOrderByStartDateDesc(
                 itemOwner.getId(), LocalDateTime.now(),
-                LocalDateTime.now(), PageRequest.of(page, size));
+                LocalDateTime.now(), PageRequest.of(page, size))
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -460,7 +467,8 @@ public class BookingRepositoryTest {
 
 
         List<Booking> found = bookingRepository.findAllByItem_Owner_IdAndEndDateIsBeforeOrderByStartDateDesc(
-                itemOwner.getId(), LocalDateTime.now(), PageRequest.of(page, size));
+                itemOwner.getId(), LocalDateTime.now(), PageRequest.of(page, size))
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -523,7 +531,8 @@ public class BookingRepositoryTest {
 
 
         List<Booking> found = bookingRepository.findAllByItem_Owner_IdAndStartDateIsAfterOrderByStartDateDesc(
-                itemOwner.getId(), LocalDateTime.now(), PageRequest.of(page, size));
+                itemOwner.getId(), LocalDateTime.now(), PageRequest.of(page, size))
+                .toList();
 
 
         assertEquals(expectedSize, found.size());
@@ -586,7 +595,8 @@ public class BookingRepositoryTest {
 
 
         List<Booking> found = bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDateDesc(
-                itemOwner.getId(), BookingStatus.REJECTED, PageRequest.of(page, size));
+                itemOwner.getId(), BookingStatus.REJECTED, PageRequest.of(page, size))
+                .toList();
 
 
         assertEquals(expectedSize, found.size());

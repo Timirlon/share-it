@@ -43,7 +43,7 @@ public class ItemControllerTest {
     @Test
     @SneakyThrows
     void findAllByOwnerIdTest() {
-        int expectedSize = 2;
+        int expectedCollectionSize = 2;
         int from = 0;
         int size = 5;
 
@@ -83,7 +83,7 @@ public class ItemControllerTest {
         mockMvc.perform(get(BASE_URL + "?from=" + from + "&size=" + size)
                     .header(USER_ID_REQUEST_HEADER, ownerId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(expectedSize))
+                .andExpect(jsonPath("$.length()").value(expectedCollectionSize))
                 .andExpect(jsonPath("$.[0].id").value(firstItemId))
                 .andExpect(jsonPath("$.[0].name").value(firstItemName))
                 .andExpect(jsonPath("$.[0].description").value(firstItemDesc))
@@ -310,14 +310,15 @@ public class ItemControllerTest {
         secondItem.setOwner(owner);
 
 
-        Mockito.when(itemService.findByText(text, from, size))
+        Mockito.when(itemService.findByText(text, from, size, ownerId))
                 .thenReturn(new PageImpl<>(
                         List.of(firstItem, secondItem)));
 
 
         mockMvc.perform(get("/items/search?text=" + text
                 + "&from=" + from
-                + "&size=" + size))
+                + "&size=" + size)
+                        .header(USER_ID_REQUEST_HEADER, ownerId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(expectedSize))
                 .andExpect(jsonPath("$.[0].id").value(firstItemId))

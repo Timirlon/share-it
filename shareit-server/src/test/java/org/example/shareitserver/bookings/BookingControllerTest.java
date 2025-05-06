@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -213,7 +214,8 @@ public class BookingControllerTest {
 
         Mockito.when(bookingService.findAllByBookerId(
                 bookerId, defaultState, defaultPage, defaultSize))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         mockMvc.perform(get("/bookings")
@@ -263,7 +265,8 @@ public class BookingControllerTest {
 
         Mockito.when(bookingService.findAllByItemOwnerId(
                         ownerId, defaultState, defaultPage, defaultSize))
-                .thenReturn(List.of(booking));
+                .thenReturn(new PageImpl<>(
+                        List.of(booking)));
 
 
         mockMvc.perform(get("/bookings/owner")

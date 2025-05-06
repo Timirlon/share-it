@@ -71,11 +71,13 @@ public class ItemClient {
                 Map.of("id", itemId));
     }
 
-    public ResponseEntity<Object> findByText(String text, int from, int size) {
+    public ResponseEntity<Object> findByText(String text, int from, int size, int userId) {
+        HttpHeaders header = getUserIdRequestHeader(userId);
+
         return restTemplate.exchange(
                 "/items/search?text={text}&from={from}&size={size}",
                 HttpMethod.GET,
-                null,
+                new HttpEntity<>(null, header),
                 Object.class,
                 Map.of("text", text, "from", from, "size", size));
     }

@@ -3,7 +3,6 @@ package org.example.shareitserver.items;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.example.shareitserver.bookings.Booking;
 import org.example.shareitserver.bookings.BookingRepository;
 import org.example.shareitserver.bookings.BookingStatus;
 import org.example.shareitserver.exceptions.NotFoundException;
@@ -32,9 +31,10 @@ public class ItemService {
     CommentRepository commentRepository;
     RequestRepository requestRepository;
 
-    //TODO: check users by id
-
     public List<Item> findAllByOwnerId(int ownerId, int from, int size) {
+        findUserByIdOrElseThrowNotFound(ownerId);
+
+
         int page = from / size;
         Pageable pageable = PageRequest.of(page, size);
 
@@ -48,6 +48,8 @@ public class ItemService {
     }
 
     public Item findById(int itemId, int userId) {
+        findUserByIdOrElseThrowNotFound(userId);
+
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Товар не найден."));
 
@@ -65,8 +67,7 @@ public class ItemService {
     }
 
     public Item create(Item item, int userId, int requestId) {
-        User owner = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
+        User owner = findUserByIdOrElseThrowNotFound(userId);
         item.setOwner(owner);
 
         if (requestId != 0) {
@@ -81,6 +82,9 @@ public class ItemService {
     }
 
     public Item update(int itemId, Item patchItem, int userId) {
+        findUserByIdOrElseThrowNotFound(userId);
+
+
         Item oldItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Товар не найден."));
 
@@ -108,7 +112,10 @@ public class ItemService {
         return patchItem;
     }
 
-    public Page<Item> findByText(String text, int from, int size) {
+    public Page<Item> findByText(String text, int from, int size, int userId) {
+        findUserByIdOrElseThrowNotFound(userId);
+
+
         if (text == null || text.isBlank()) {
             return Page.empty();
         }
@@ -128,7 +135,7 @@ public class ItemService {
 
         //Нельзя оставлять комментарий к товару которым не пользовались
         //проверка по userId и itemId, статус и дата старта в прошлом (т.е комментатор уже попользовался товаром)
-        Booking booking = bookingRepository.findAllByBooker_IdAndItem_IdAndStatusAndStartDateBeforeOrderByStartDateAsc(
+        bookingRepository.findAllByBooker_IdAndItem_IdAndStatusAndStartDateBeforeOrderByStartDateAsc(
                 authorId, itemId, BookingStatus.APPROVED, LocalDateTime.now()).stream()
                 .findFirst()
                 .orElseThrow(() -> new ValidationException("Вы не можете оставлять отзыв на этот товар."));
@@ -140,5 +147,10 @@ public class ItemService {
 
         commentRepository.save(comment);
         return comment;
+    }
+
+    private User findUserByIdOrElseThrowNotFound(int userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
     }
 }
